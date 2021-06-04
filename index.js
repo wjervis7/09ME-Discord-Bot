@@ -10,7 +10,7 @@ client.on("ready", async () => {
     console.log("Client is ready.");
 
     // register event handlers
-    privateMessage(client);
+    await privateMessage(client);
 });
 
 client.login(process.env.TOKEN);
