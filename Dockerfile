@@ -8,4 +8,8 @@ RUN npm ci --only=production
 
 COPY . .
 
+ENV TOKEN=
+ENV GUILD=
+ENV CHANNEL=
+
 CMD [ "node", "index.js" ]
