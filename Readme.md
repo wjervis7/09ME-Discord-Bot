@@ -1,7 +1,5 @@
 # Configuration
-
 The following variables need to be set, either through an .env file (if running directly), or through environment variables (needed for Docker):
-
 <table>
     <tr>
         <th>Key</th>
@@ -23,10 +21,16 @@ The following variables need to be set, either through an .env file (if running 
 
 # Running the Bot
 The bot can be ran two ways: Node.js and Docker.
+
 ## Node
 1. Clone repo
 1. Install dependencies: `npm ci --only=production`
 1. Create .env file with config values (see Configuration above)
 1. Run app: `node index.js`
+
 ## Docker
 1. Run image (fill in config values): `docker run -e GUILD= -e CHANNEL= -e TOKEN= wjervis7/09me-discord`
+
+# Features
+ - Users can DM the bot to send a message to the admin team.  Bot will prompt the user if they want the message to be sent anonymously.  Message will be sent to a predetermined channel.
+ 
