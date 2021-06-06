@@ -1,4 +1,5 @@
 import { Client } from "discord.js";
+import "discord-reply";
 import dotenv from "dotenv";
 import privateMessage from "./events/private-message.js";
 
