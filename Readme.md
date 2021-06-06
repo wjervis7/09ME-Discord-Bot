@@ -34,3 +34,21 @@ The bot can be ran two ways: Node.js and Docker.
 # Features
  - Users can DM the bot to send a message to the admin team.  Bot will prompt the user if they want the message to be sent anonymously.  Message will be sent to a predetermined channel.
  
+ # Development
+
+ ## Requirements
+
+  - An IDE (e.g., [Visual Studio Code](https://code.visualstudio.com/download))
+  - [Node.js](https://nodejs.org/en/)
+  - A Git client (e.g., [GitHub Desktop](https://desktop.github.com/))
+  - (Optional) [Docker](https://docs.docker.com/get-docker/)
+
+## Instructions
+
+1. Clone the GitHub repo 
+1. Create a new branch based off dev branch
+1. Install dependencies: `npm i`
+1. (Optional) install nodemon globally: `npm i --global nodemon`
+1. Develop
+1. Push changes to repo
+1. Create a pull request to merge your branch to dev
