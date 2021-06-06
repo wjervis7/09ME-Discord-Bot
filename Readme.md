@@ -30,3 +30,7 @@ The bot can be ran two ways: Node.js and Docker.
 
 ## Docker
 1. Run image (fill in config values): `docker run -e GUILD= -e CHANNEL= -e TOKEN= wjervis7/09me-discord`
+
+# Features
+ - Users can DM the bot to send a message to the admin team.  Bot will prompt the user if they want the message to be sent anonymously.  Message will be sent to a predetermined channel.
+ 
