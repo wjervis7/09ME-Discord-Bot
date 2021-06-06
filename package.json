@@ -1,6 +1,6 @@
 {
   "name": "09me-discord-bot",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "description": "Discord bot for 09ME server.",
   "main": "index.js",
   "type": "module",
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/wjervis7/09ME-Discord-Bot#readme",
   "dependencies": {
+    "discord-reply": "^0.1.2",
     "discord.js": "^12.5.3",
     "dotenv": "^10.0.0"
   },
