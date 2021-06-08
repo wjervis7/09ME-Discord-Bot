@@ -1,0 +1,36 @@
+{
+    "version": "1.0",
+    "defaultProvider": "cdnjs",
+    "libraries": [
+        {
+            "library": "jquery@3.6.0",
+            "destination": "wwwroot/lib/jquery/"
+        },
+        {
+            "library": "twitter-bootstrap@5.0.1",
+            "destination": "wwwroot/lib/bootstrap/",
+            "files": [
+                "js/bootstrap.bundle.js",
+                "js/bootstrap.bundle.js.map",
+                "js/bootstrap.bundle.min.js",
+                "js/bootstrap.bundle.min.js.map",
+                "js/bootstrap.esm.js",
+                "js/bootstrap.esm.js.map",
+                "js/bootstrap.esm.min.js",
+                "js/bootstrap.esm.min.js.map",
+                "js/bootstrap.js",
+                "js/bootstrap.js.map",
+                "js/bootstrap.min.js",
+                "js/bootstrap.min.js.map"
+            ]
+        },
+        {
+            "library": "jquery-validate@1.19.2",
+            "destination": "wwwroot/lib/jquery-validate/"
+        },
+        {
+            "library": "jquery-validation-unobtrusive@3.2.12",
+            "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
+        }
+    ]
+}
