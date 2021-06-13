@@ -12,22 +12,19 @@ namespace _09.Mass.Extinction.Web
 
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostEnvironment environment, ILogger<Startup> logger)
+        public Startup(IConfiguration configuration, IHostEnvironment environment)
         {
             Configuration = configuration;
             Environment = environment;
-            Logger = logger;
         }
 
         public IConfiguration Configuration { get; }
         public IHostEnvironment Environment { get; }
-        public ILogger<Startup> Logger { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("DefaultConnection").Replace("~", Environment.ContentRootPath);
-            Logger.LogCritical($"Connection String: {connectionString}");
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
             services.AddDatabaseDeveloperPageExceptionFilter();
