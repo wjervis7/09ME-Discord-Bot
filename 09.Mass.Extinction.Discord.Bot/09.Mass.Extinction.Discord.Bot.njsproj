@@ -30,6 +30,12 @@
   <ItemGroup>
     <Content Include=".env" />
     <Content Include="app.js" />
+    <Content Include="data\context.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="data\entities\Message.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="Dockerfile" />
     <Content Include="events\private-message.js" />
     <Content Include="package-lock.json" />
@@ -37,7 +43,9 @@
     <Content Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="data\entities\" />
     <Folder Include="events\" />
+    <Folder Include="data\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
 </Project>
