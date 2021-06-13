@@ -16,4 +16,4 @@ client.on("ready", async () => {
     await privateMessage(client);
 });
 
-client.login("ODUwNDUyNTc4NzA1NzM1NzIw.YLp7rw.wAvnCeCuD5RbtuOEql_hD1km6WM");
+client.login(process.env.TOKEN);
