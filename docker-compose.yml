@@ -2,9 +2,6 @@ version: '3.7'
 services:
   bot:
     image: wjervis7/09me-discord:latest
-    build: 
-      context: .
-      dockerfile: Dockerfile
     environment:
       - TOKEN
       - GUILD
@@ -21,9 +18,6 @@ services:
 
   website:
     image: wjervis7/09me-website:latest
-    build: 
-      context: .
-      dockerfile: Dockerfile
     ports:
       - "443:443"
       - "80:80"
