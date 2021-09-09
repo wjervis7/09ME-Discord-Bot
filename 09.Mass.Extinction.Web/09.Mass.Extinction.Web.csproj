@@ -11,7 +11,6 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.Discord" Version="5.0.11" />
     <PackageReference Include="MailKit" Version="2.15.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.8" />
