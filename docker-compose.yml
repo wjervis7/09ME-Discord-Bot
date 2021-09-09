@@ -1,0 +1,50 @@
+version: '3.7'
+services:
+  bot:
+    image: wjervis7/09me-discord:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - TOKEN
+      - GUILD
+      - CHANNEL
+      - DB_NAME
+      - DB_USER=sa
+      - DB_PASS
+      - DB_HOST
+      - DB_PORT
+    depends_on:
+      - database
+      - website
+    restart: always
+
+  website:
+    image: wjervis7/09me-website:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "443:443"
+      - "80:80"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=database,1433;Database=${DB_NAME};User=sa;Password=${DB_PASS}
+      - Authentication__Discord__ClientSecret=${DISCORD_CLIENTSECRET}
+      - Authentication__Discord__ClientId=${DISCORD_CLIENTID}
+      - Application__AdminPassword=${ADMIN_PASS}
+      - Application__AdminEmail=${ADMIN_USER}
+      - Email__Username=${EMAIL_USER}
+      - Email__Password=${EMAIL_PASS}
+      - Email__Sender__Display=${EMAIL_Display}
+      - Email__Sender__Email=${EMAIL_USER}
+    depends_on:
+      - database
+    restart: always
+
+  database:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASS}
+    volumes:
+      - /data/09me-sql:/var/opt/mssql/data
