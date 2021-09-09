@@ -3,7 +3,7 @@
     "defaultProvider": "cdnjs",
     "libraries": [
         {
-            "library": "twitter-bootstrap@5.0.1",
+            "library": "twitter-bootstrap@5.1.1",
             "destination": "scss/bootstrap/",
             "files": [
                 "scss/forms/_floating-labels.scss",

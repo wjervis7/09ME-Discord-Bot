@@ -2,13 +2,14 @@
 {
     using System.Linq;
     using System.Threading.Tasks;
+    using Entities;
     using Enums;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.Extensions.Configuration;
 
     public class ContextSeed
     {
-        public static async Task SeedRolesAsync(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
         {
             //Seed Roles
             if (await roleManager.FindByNameAsync(Roles.DiscordAdmin.ToString()) == null)
@@ -22,11 +23,13 @@
             }
         }
 
-        public static async Task SeedAdminUserAsync(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public static async Task SeedAdminUserAsync(UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
-            var adminUser = new IdentityUser
+            var adminUser = new ApplicationUser
             {
                 UserName = configuration.GetValue<string>("Application:AdminEmail"),
+                Name = "Admin User",
+                ProfilePicture = "https://cdn.discordapp.com/avatars/850452578705735720/ecd4aacda4e908f90fc15c01dc196a14.png",
                 Email = configuration.GetValue<string>("Application:AdminEmail"),
                 EmailConfirmed = true
             };
