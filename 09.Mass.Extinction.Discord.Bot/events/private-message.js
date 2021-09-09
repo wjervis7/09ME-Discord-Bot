@@ -12,16 +12,18 @@ export default async function privateMessage(client) {
 
     client.on("message", async (message) => {
         const { author: { username, discriminator, id: authorId }, channel: { type }, content } = message;
-        if (content.length === 0) {
-            await message.lineReply(
-                "Your message contains no content (did you send a sticker?), so I can't send anything to the admin team.");
-            return;
-        }
+        
         if (type !== "dm" || message.author.bot) {
             return;
         }
 
         try {
+            if (content.length === 0) {
+                await message.lineReply(
+                    "Your message contains no content (did you send a sticker?), so I can't send anything to the admin team.");
+                return;
+            }
+
             const reply =
                 await message.lineReply("Do you want to send this anonymously? React with 🇾 for yes, or 🇳 for no.");
             await reply.react("🇾");
