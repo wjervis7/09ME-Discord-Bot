@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import "discord-reply"; // not sure if needed, since it was added in index.js
+// ReSharper disable once InconsistentNaming
 import Context from "../data/context.js";
 
 const context = new Context();
@@ -11,7 +12,11 @@ export default async function privateMessage(client) {
 
     client.on("message", async (message) => {
         const { author: { username, discriminator, id: authorId }, channel: { type }, content } = message;
-
+        if (content.length === 0) {
+            await message.lineReply(
+                "Your message contains no content (did you send a sticker?), so I can't send anything to the admin team.");
+            return;
+        }
         if (type !== "dm" || message.author.bot) {
             return;
         }
