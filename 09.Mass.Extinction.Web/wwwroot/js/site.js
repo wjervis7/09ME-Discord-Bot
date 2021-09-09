@@ -2,3 +2,10 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
+(($, moment) => {
+    $("[data-datetime]").each((_, el) => {
+        const dateTime = $(el).data("datetime");
+        const m = moment.utc(dateTime);
+        $(el).text(m.local().format("llll"));
+    });
+})(jQuery, moment);

@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Data.Entities;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
@@ -13,9 +14,9 @@
     public class UserRolesController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UserRolesController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UserRolesController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -94,7 +95,7 @@
             return RedirectToAction("Index");
         }
 
-        private async Task<List<string>> GetUserRoles(IdentityUser user)
+        private async Task<List<string>> GetUserRoles(ApplicationUser user)
         {
             return new List<string>(await _userManager.GetRolesAsync(user));
         }

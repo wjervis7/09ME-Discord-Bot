@@ -18,12 +18,6 @@
             _context = context;
         }
 
-        [AllowAnonymous]
-        public IActionResult Redirect()
-        {
-            return View();
-        }
-
         [HttpGet]
         public async Task<IActionResult> Messages()
         {
