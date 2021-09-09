@@ -40,5 +40,6 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=${DB_PASS}
+    restart: always
     volumes:
       - /data/09me-sql:/var/opt/mssql/data
