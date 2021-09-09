@@ -1,15 +1,17 @@
 namespace _09.Mass.Extinction.Web
 {
     using Data;
+    using Data.Entities;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.HttpOverrides;
     using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Identity.UI.Services;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
+    using Services;
 
     public class Startup
     {
@@ -30,6 +32,9 @@ namespace _09.Mass.Extinction.Web
                 options.UseSqlServer(connectionString));
             services.AddDatabaseDeveloperPageExceptionFilter();
 
+            services.AddTransient<IEmailSender, ZohoEmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration.GetSection("Email"));
+
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireDigit = false;
@@ -40,16 +45,17 @@ namespace _09.Mass.Extinction.Web
                 options.Password.RequiredLength = 12;
             });
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddAuthentication()
-                .AddGoogle(options =>
+                .AddDiscord(options =>
                 {
-                    var googleAuthSection = Configuration.GetSection("Authentication:Google");
-                    options.ClientId = googleAuthSection["ClientId"];
-                    options.ClientSecret = googleAuthSection["ClientSecret"];
+                    var discordAuthSection = Configuration.GetSection("Authentication:Discord");
+                    options.ClientId = discordAuthSection["ClientId"];
+                    options.ClientSecret = discordAuthSection["ClientSecret"];
+                    options.Scope.Add("email");
                 });
 
             services.AddControllersWithViews();

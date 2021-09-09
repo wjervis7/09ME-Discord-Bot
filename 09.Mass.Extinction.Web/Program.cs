@@ -3,6 +3,7 @@ namespace _09.Mass.Extinction.Web
     using System;
     using System.Threading.Tasks;
     using Data;
+    using Data.Entities;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
@@ -26,11 +27,11 @@ namespace _09.Mass.Extinction.Web
                     var context = services.GetRequiredService<ApplicationDbContext>();
                     await context.Database.MigrateAsync();
 
-                    var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                     var configuration = services.GetRequiredService<IConfiguration>();
-                    await ContextSeed.SeedRolesAsync(userManager, roleManager);
-                    await ContextSeed.SeedAdminUserAsync(userManager, roleManager, configuration);
+                    await ContextSeed.SeedRolesAsync(roleManager);
+                    await ContextSeed.SeedAdminUserAsync(userManager, configuration);
 
                     await context.SaveChangesAsync();
                 }
