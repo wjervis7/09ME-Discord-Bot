@@ -6,6 +6,18 @@ import Context from "../data/context.js";
 const context = new Context();
 dotenv.config();
 
+const noBodyText = `
+Your message lacks content, so I can't send anything to the Admin Team. Perhaps, you've included:
+• GIFs
+• Images
+• Stickers
+If so, edit your message, and try sending it, again.
+`;
+
+const anonymousReplyMessageText = "Do you want to send this anonymously? React with 🇾 for yes, or 🇳 for no.";
+
+const messageSentText = "Message was sent to the admin team.";
+
 export default async function privateMessage(client) {
     const guild = await client.guilds.fetch(process.env.GUILD);
     const channel = guild.channels.cache.find(ch => ch.id === process.env.CHANNEL);
@@ -19,13 +31,12 @@ export default async function privateMessage(client) {
 
         try {
             if (content.length === 0) {
-                await message.lineReply(
-                    "Your message contains no content (did you send a sticker?), so I can't send anything to the admin team.");
+                await message.lineReply(noBodyText);
                 return;
             }
 
             const reply =
-                await message.lineReply("Do you want to send this anonymously? React with 🇾 for yes, or 🇳 for no.");
+                await message.lineReply(anonymousReplyMessageText);
             await reply.react("🇾");
             await reply.react("🇳");
 
@@ -46,7 +57,7 @@ export default async function privateMessage(client) {
                     }
 
                     collector.stop();
-                    await reply.reply("Message was sent to the admin team.");
+                    await reply.reply(messageSentText);
                 } catch (innerError) {
                     console.error("An error has occurred :(.", innerError);
                 }
