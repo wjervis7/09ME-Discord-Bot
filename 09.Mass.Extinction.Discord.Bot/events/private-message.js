@@ -1,10 +1,6 @@
-import dotenv from "dotenv";
-import "discord-reply"; // not sure if needed, since it was added in index.js
-// ReSharper disable once InconsistentNaming
-import Context from "../data/context.js";
-
+const Context = require("../data/context.js");
+const { guildId, channelId } = require("../config.json");
 const context = new Context();
-dotenv.config();
 
 const noBodyText = `
 Your message lacks content, so I can't send anything to the Admin Team. Perhaps, you've included:
@@ -18,52 +14,58 @@ const anonymousReplyMessageText = "Do you want to send this anonymously? React w
 
 const messageSentText = "Message was sent to the admin team.";
 
-export default async function privateMessage(client) {
-    const guild = await client.guilds.fetch(process.env.GUILD);
-    const channel = guild.channels.cache.find(ch => ch.id === process.env.CHANNEL);
+module.exports = {
+    name: "Private Message handler",
+    async listen(client) {
+        const guild = await client.guilds.fetch(guildId);
+        const channel = guild.channels.cache.find(ch => ch.id === channelId);
 
-    client.on("message", async (message) => {
-        const { author: { username, discriminator, id: authorId }, channel: { type }, content } = message;
-        
-        if (type !== "dm" || message.author.bot) {
-            return;
-        }
+        client.on("messageCreate",
+            async (message) => {
+                const { author: { username, discriminator, id: authorId }, channel: { type }, content } = message;
 
-        try {
-            if (content.length === 0) {
-                await message.lineReply(noBodyText);
-                return;
-            }
+                if (type !== "DM" || message.author.bot) {
+                    return;
+                }
 
-            const reply =
-                await message.lineReply(anonymousReplyMessageText);
-            await reply.react("🇾");
-            await reply.react("🇳");
-
-            const filter = (reaction, user) => user.id === authorId &&
-                (reaction.emoji.name === "🇾" || reaction.emoji.name === "🇳");
-            const collector = reply.createReactionCollector(filter, { time: 15000 });
-            collector.on("collect", async (reaction) => {
-                const isAnonymous = reaction.emoji.name === "🇾";
-                const sender = `${username}#${discriminator}`;
                 try {
-                    const newMessage = await context.createMessage(sender, content, isAnonymous);
-                    console.log(newMessage);
-
-                    if (isAnonymous) {
-                        await channel.send(`Anonymous mesage received:\n>>> ${content}`);
-                    } else {
-                        await channel.send(`Mesage received from ${sender}:\n>>> ${content}`);
+                    if (content.length === 0) {
+                        await message.reply(noBodyText);
+                        return;
                     }
 
-                    collector.stop();
-                    await reply.reply(messageSentText);
-                } catch (innerError) {
-                    console.error("An error has occurred :(.", innerError);
+                    const reply = await message.reply(anonymousReplyMessageText);
+                    await reply.react("🇾");
+                    await reply.react("🇳");
+
+                    const filter = (reaction, user) => {
+                        return (reaction.emoji.name === "🇾" || reaction.emoji.name === "🇳") && user.id === authorId;
+                    };
+
+                    const collector = reply.createReactionCollector({ filter, time: 15_000 });
+                    collector.on("collect", async(reaction) => {
+                        const isAnonymous = reaction.emoji.name === "🇾";
+                        console.log(`Message is anonymous: ${isAnonymous}.`);
+                        const sender = `${username}#${discriminator}`;
+                        try {
+                            const newMessage = await context.createMessage(sender, content, isAnonymous);
+                            console.log(newMessage);
+
+                            if (isAnonymous) {
+                                await channel.send(`Anonymous message received:\n>>> ${content}`);
+                            } else {
+                                await channel.send(`Message received from ${sender}:\n>>> ${content}`);
+                            }
+
+                            collector.stop();
+                            await reply.channel.send(messageSentText);
+                        } catch (collectorError) {
+                            console.error("An error has occurred :(", collectorError);
+                        }
+                    });
+                } catch (error) {
+                    console.error("An error has occurred :(.", error);
                 }
             });
-        } catch (error) {
-            console.error("An error has occurred :(.", error);
-        }
-    });
+    }
 };

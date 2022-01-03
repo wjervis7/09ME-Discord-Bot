@@ -1,5 +1,4 @@
-import sequelize from "sequelize";
-const { Model, DataTypes } = sequelize;
+const { Model, DataTypes } = require("sequelize");
 
 class Message extends Model {
     static sequelizeInit() {
@@ -30,4 +29,4 @@ class Message extends Model {
     }
 }
 
-export default Message;
+module.exports = Message;

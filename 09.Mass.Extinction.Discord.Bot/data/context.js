@@ -1,14 +1,11 @@
-import { Sequelize } from "sequelize";
-import Message from "./entities/Message.js";
-import dotenv from "dotenv";
+const { Sequelize } = require("sequelize");
+const Message = require("./entities/Message.js");
+const { DB_NAME: dbName, DB_USER: user, DB_PASS: password, DB_HOST: host, DB_PORT: port } = require("../config.json");
 
-dotenv.config();
-
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
+const sequelize = new Sequelize(dbName, user, password, {
+    host,
+    port,
     dialect: "mssql",
-    operatorsAliases: false,
     pool: {
         max: 5,
         min: 0,
@@ -27,10 +24,6 @@ Message.init(
         tableName: "Messages"
     }
 );
-
-
-
-
 
 (async () => {
     try {
@@ -53,4 +46,4 @@ class Context {
     }
 }
 
-export default Context;
+module.exports = Context;

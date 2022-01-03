@@ -1,13 +1,15 @@
 const fs = require("fs");
 const { Client, Collection, Intents } = require("discord.js");
-const { REST } = require("@discordjs/rest");
-const { Routes } = require("discord-api-types/v9");
-const { token, clientId, guildId, adminRole } = require("./config.json");
+const commandHelper = require("./deploy-commands.js");
+const { token } = require("./config.json");
 
 // import privateMessage from "./events/private-message.js";
 
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS],
+    partials: ["CHANNEL"]
+});
 
 client.commands = new Collection();
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
@@ -19,11 +21,19 @@ for (const file of commandFiles) {
 client.once("ready", async () => {
     console.log("Client is ready.");
 
+    // deploy slash commands
+    await commandHelper.deployCommands();
+
     // update slash command permissions
-    await setSlashCommandPermissions();
-    
+    await commandHelper.setPermissions(client);
+
     // register event handlers
-    // await privateMessage(client);
+    const events = fs.readdirSync("./events").filter(file => file.endsWith(".js"));
+    for (const file of events) {
+        const event = require(`./events/${file}`);
+        console.log(`Starting event handler '${event.name}'.`);
+        event.listen(client);
+    }
 });
 
 client.on("interactionCreate", async interaction => {
@@ -42,28 +52,3 @@ client.on("interactionCreate", async interaction => {
 });
 
 client.login(token);
-
-const setSlashCommandPermissions = async () => {
-    const guild = client.guilds.cache.get(guildId);
-    const everyone = guild.roles.everyone.id;
-    
-    const rest = new REST({ version: "9" }).setToken(token);
-    const guildCommands = await rest.get(Routes.applicationGuildCommands(clientId, guildId));
-
-    // yogie
-    const yogieId = guildCommands.find(command => command.name === "yogie").id;
-    const yogieCommand = await guild.commands.fetch(yogieId);
-    const yogiePermissions = [
-        {
-            id: everyone,
-            type: "ROLE",
-            permission: false
-        },
-        {
-            id: adminRole,
-            type: "ROLE",
-            permission: true
-        }
-    ];
-    await yogieCommand.permissions.set({ permissions: yogiePermissions });
-}
