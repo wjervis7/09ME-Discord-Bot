@@ -28,12 +28,22 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".eslintrc.json" />
     <Content Include=".env" />
     <Content Include="app.js" />
+    <Content Include="commands\yogie.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="config.json">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="data\context.js">
       <SubType>Code</SubType>
     </Content>
     <Content Include="data\entities\Message.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="deploy-commands.js">
       <SubType>Code</SubType>
     </Content>
     <Content Include="Dockerfile" />
@@ -46,6 +56,7 @@
     <Folder Include="data\entities\" />
     <Folder Include="events\" />
     <Folder Include="data\" />
+    <Folder Include="commands\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
 </Project>
