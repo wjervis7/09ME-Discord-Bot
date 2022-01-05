@@ -34,22 +34,23 @@ const setPermissions = (async(client) => {
 
     const guildCommands = await rest.get(Routes.applicationGuildCommands(clientId, guildId));
 
-    // yogie
-    const yogieId = guildCommands.find(command => command.name === "yogie").id;
-    const yogieCommand = await guild.commands.fetch(yogieId);
-    const yogiePermissions = [
-        {
-            id: everyone,
-            type: "ROLE",
-            permission: false
-        },
-        {
-            id: adminRole,
-            type: "ROLE",
-            permission: true
-        }
-    ];
-    await yogieCommand.permissions.set({ permissions: yogiePermissions });
+    // Example below
+    //// yogie
+    //const yogieId = guildCommands.find(command => command.name === "yogie").id;
+    //const yogieCommand = await guild.commands.fetch(yogieId);
+    //const yogiePermissions = [
+    //    {
+    //        id: everyone,
+    //        type: "ROLE",
+    //        permission: false
+    //    },
+    //    {
+    //        id: adminRole,
+    //        type: "ROLE",
+    //        permission: true
+    //    }
+    //];
+    //await yogieCommand.permissions.set({ permissions: yogiePermissions });
 
     console.log("Successfully set permissions for slash commands.");
 });
