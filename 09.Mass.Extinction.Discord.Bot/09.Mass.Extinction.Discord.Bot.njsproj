@@ -31,7 +31,10 @@
     <Content Include=".eslintrc.json" />
     <Content Include=".env" />
     <Content Include="app.js" />
-    <Content Include="commands\yogie.js">
+    <Content Include="commands\time-zone.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="commands\time.js">
       <SubType>Code</SubType>
     </Content>
     <Content Include="config.json">
@@ -43,6 +46,9 @@
     <Content Include="data\entities\Message.js">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="data\entities\DiscordUser.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="deploy-commands.js">
       <SubType>Code</SubType>
     </Content>
@@ -51,6 +57,7 @@
     <Content Include="package-lock.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
+    <Content Include="timezones.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="data\entities\" />

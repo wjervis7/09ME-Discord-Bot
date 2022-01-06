@@ -3,9 +3,6 @@ const { Client, Collection, Intents } = require("discord.js");
 const commandHelper = require("./deploy-commands.js");
 const { token } = require("./config.json");
 
-// import privateMessage from "./events/private-message.js";
-
-
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS],
     partials: ["CHANNEL"]

@@ -1,5 +1,6 @@
 const { Sequelize } = require("sequelize");
 const Message = require("./entities/Message.js");
+const DiscordUser = require("./entities/DiscordUser.js");
 const { DB_NAME: dbName, DB_USER: user, DB_PASS: password, DB_HOST: host, DB_PORT: port } = require("../config.json");
 
 const sequelize = new Sequelize(dbName, user, password, {
@@ -25,6 +26,14 @@ Message.init(
     }
 );
 
+DiscordUser.init(
+    DiscordUser.sequelizeInit(),
+    {
+        sequelize,
+        tableName: "DiscordUsers"
+    }
+);
+
 (async () => {
     try {
         await sequelize.authenticate();
@@ -43,6 +52,23 @@ class Context {
             isAnonymous
         });
         return newMessage;
+    }
+
+    async updateDiscordUserTimeZone(userId, timeZone) {
+        return await DiscordUser.upsert({
+            id: userId,
+            timeZone
+        });
+    }
+
+    async getDiscordUserTimeZone(userId) {
+        const discordUser = await DiscordUser.findByPk(userId);
+        return discordUser.timeZone;
+    }
+
+    async getTimeZones() {
+        const discordUsers = await DiscordUser.findAll({ attributes: ["timeZone"] });
+        return [... new Set(discordUsers.map(discordUser => discordUser.timeZone))];
     }
 }
 
