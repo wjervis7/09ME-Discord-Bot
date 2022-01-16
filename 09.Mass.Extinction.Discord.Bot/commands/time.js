@@ -24,6 +24,7 @@ const command = new SlashCommandBuilder()
     );
 
 module.exports = {
+    name: command.name,
     data: command,
     async execute(interaction) {
         const time = interaction.options.getString("value");

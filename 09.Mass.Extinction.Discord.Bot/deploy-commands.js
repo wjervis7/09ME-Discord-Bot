@@ -8,7 +8,11 @@ const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith("
 
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    commands.push(command.data.toJSON());
+    commands.push({
+        name: command.name,
+        data: command.data.toJSON(),
+        permissions: command.permissions
+    });
 }
 
 const rest = new REST({ version: "9" }).setToken(token);
@@ -16,9 +20,10 @@ const rest = new REST({ version: "9" }).setToken(token);
 const deployCommands = (async () => {
     try {
         console.log("Started refreshing slash commands.");
+        const body = commands.map(c => c.data);
         await rest.put(
             Routes.applicationGuildCommands(clientId, guildId),
-            { body: commands }
+            { body }
         );
 
         console.log("Successfully reloaded slash commands.");
@@ -34,23 +39,32 @@ const setPermissions = (async(client) => {
 
     const guildCommands = await rest.get(Routes.applicationGuildCommands(clientId, guildId));
 
-    // Example below
-    //// yogie
-    //const yogieId = guildCommands.find(command => command.name === "yogie").id;
-    //const yogieCommand = await guild.commands.fetch(yogieId);
-    //const yogiePermissions = [
-    //    {
-    //        id: everyone,
-    //        type: "ROLE",
-    //        permission: false
-    //    },
-    //    {
-    //        id: adminRole,
-    //        type: "ROLE",
-    //        permission: true
-    //    }
-    //];
-    //await yogieCommand.permissions.set({ permissions: yogiePermissions });
+    for (const command of commands) {
+        if (!command.permissions) {
+            continue;
+        }
+        const id = guildCommands.find(c => c.name === command.name).id;
+        const cmd = await guild.commands.fetch(id);
+        const permissions = command.permissions.map(p => {
+            const permission = {
+                type: p.type,
+                permission: p.permission
+            };
+            if (isNaN(p.id)) {
+                if (p.id === "everyone") {
+                    permission.id = everyone;
+                } else if (p.id === "adminRole") {
+                    permission.id = adminRole;
+                } else {
+                    throw new Error(`Invalid permission: '${permission.id}', for command: '${command.name}'.`);
+                }
+            } else {
+                permission.id = p.id;
+            }
+            return permission;
+        });
+        await cmd.permissions.set({ permissions });
+    }
 
     console.log("Successfully set permissions for slash commands.");
 });
