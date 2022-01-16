@@ -71,7 +71,7 @@ const removeTimezone = async(interaction) => {
     await interaction.reply({ content: zoneRemovedMessage, ephemeral: true });
 };
 
-const findSimilarTimeZones = (timezone) => {
+const findSimilarTimeZones = (timeZone) => {
     let similarZones = timezones
         .filter(tz => similarTimeZoneFilter(tz, timeZone))
         .map(tz => tz.utc.filter(s => s.includes("/")))
@@ -80,7 +80,7 @@ const findSimilarTimeZones = (timezone) => {
     similarZones = similarZones.sort((a, b) => a.localeCompare(b));
 
     return similarZones;
-}
+};
 
 const similarTimeZoneFilter = (tz, timeZone) => {
     const re = new RegExp(`\b${timeZone}\b`, "i");
@@ -90,11 +90,13 @@ const similarTimeZoneFilter = (tz, timeZone) => {
         re.test(tz.abbr) ||
         tz.text === timeZone ||
         re.test(tz.text);
-}
+};
 
 module.exports = {
+    name: command.name,
     data: command,
     async execute(interaction) {
+        interaction.ephemeral = true;
         const subCommand = interaction.options.getSubcommand();
         if (subCommand === "set") {
             await setTimezone(interaction);
