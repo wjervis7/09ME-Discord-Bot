@@ -11,6 +11,7 @@
         { }
 
         public DbSet<Message> Messages { get; set; }
+        public DbSet<DiscordUser> DiscordUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -22,6 +23,13 @@
                 entity.Property(e => e.Body).IsRequired();
                 entity.Property(e => e.DateSent).IsRequired();
                 entity.Property(e => e.IsAnonymous).IsRequired();
+            });
+
+            builder.Entity<DiscordUser>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnName("DiscordUserId").ValueGeneratedNever();
+                entity.Property(e => e.TimeZone).IsRequired(false);
             });
 
             base.OnModelCreating(builder);

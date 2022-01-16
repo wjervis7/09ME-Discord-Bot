@@ -3,11 +3,8 @@ const { Client, Collection, Intents } = require("discord.js");
 const commandHelper = require("./deploy-commands.js");
 const { token } = require("./config.json");
 
-// import privateMessage from "./events/private-message.js";
-
-
 const client = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS],
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS],
     partials: ["CHANNEL"]
 });
 
@@ -40,14 +37,23 @@ client.on("interactionCreate", async interaction => {
     if (!interaction.isCommand()) return;
 
     const command = client.commands.get(interaction.commandName);
-    
+
     if (!command) return;
 
     try {
         await command.execute(interaction);
     } catch (error) {
         console.error(error);
-        return interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
+        const message = "There was an error while executing this command!";
+        if (interaction.deferred && interaction.ephemeral) {
+            interaction.editReply({ content: message, ephemeral: true });
+        } else if (interaction.deferred) {
+            interaction.editReply(message);
+        } else if (interaction.ephemeral) {
+            interaction.reply({ content: message, ephemeral: true });
+        } else {
+            interaction.reply(message);
+        }
     }
 });
 
