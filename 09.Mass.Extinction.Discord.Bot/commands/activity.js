@@ -1,6 +1,6 @@
-const { Permissions } = require("discord.js");
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const moment = require("moment");
+const { to } = require("../utilities/asyncHelpers.js");
 const { guildId, restrictions } = require("../config.json");
 
 const command = new SlashCommandBuilder()
@@ -45,14 +45,11 @@ const command = new SlashCommandBuilder()
 const allowedChannels = restrictions.find(r => r.command === command.name).channels;
 
 // gets all users that haven't made x number of posts, in the last y number of days.
-const getInactiveUsers = async (interaction) => {
-    const posts = interaction.options.getInteger("posts");
-    const days = interaction.options.getInteger("days");
-    const guild = interaction.client.guilds.cache.get(guildId);
-    const dateToCheck = moment().startOf("day").subtract(days, "days").valueOf();
-
-    const guildMembers = await guild.members.fetch();
-    const channels = await guild.channels.cache;
+const getInactiveUsers = async (guild, posts, days, dateToCheck) => {
+    const [error, { guildMembers, channels }] = await to(getGuildMembersAndChannels(guild));
+    if (error) {
+        return error;
+    }
 
     const inactiveUsers = [];
 
@@ -78,55 +75,94 @@ const getInactiveUsers = async (interaction) => {
     }
 
     if (!inactiveUsers.length) {
-        interaction.editReply(`All users have made at least ${posts} ${postsText}, within the last ${days} ${daysText}.`);
-        return;
+        return `All users have made at least ${posts} ${postsText}, within the last ${days} ${daysText}.`;
     }
 
     const inactiveUsersText = `${inactiveUsers.length} ${inactiveUsers.length === 1 ? "user has" : "users have"}`;
 
-    const message = `
+    return `
 ${inactiveUsersText} not made ${posts} ${postsText}, within the last ${days} ${daysText}:${inactiveUsers.join("")}`;
-
-    interaction.editReply(message);
 };
 
 // counts number of posts made, by user, in the last x number of days.
-const checkUserActivity = async (interaction) => {
-    const user = interaction.options.getUser("value");
-    const days = interaction.options.getInteger("days");
-    const guild = interaction.client.guilds.cache.get(guildId);
-    const guildMember = await guild.members.fetch(user.id);
-    const channels = await guild.channels.cache;
-    const dateToCheck = moment().startOf("day").subtract(days, "days").valueOf();
+const checkUserActivity = async (guild, user, days, dateToCheck) => {
+    let error;
+    let guildMember;
+    let channels;
+    let activity;
 
-    const activity = await getUserActivity(user, channels, dateToCheck);
-
-    if (!activity.length) {
-        interaction.editReply(`${guildMember.displayName} has not made any posts, in the last ${days} days.`);
-        return;
+    [error, { guildMembers: guildMember, channels }] = await to(getGuildMembersAndChannels(guild, user.id));
+    if (error) {
+        return error;
     }
 
-    const message = `
-${guildMember.displayName}'s activity, over the last ${days} days:${activity.map(a => `
-> In <#${a.channel}>: ${a.posts} ${a.posts.length === 1 ? "post" : "posts"}, with the most recent one on <t:${a.lastPost}:f>.`).join("")}
-`;
+    [error, activity] = await to(getUserActivity(user, channels, dateToCheck));
+    if (error) {
+        return error;
+    }
 
-    interaction.editReply(message);
+    activity = activity.filter(a => a.posts > 0);
+
+    if (!activity.length) {
+        return `${guildMember.displayName} has not made any posts, in the last ${days} days.`;
+    }
+    activity = activity.map(a => {
+        if (a.type === "c") {
+            return `
+> In <#${a.channel}>: ${a.posts} ${a.posts.length === 1 ? "post" : "posts"}, with the most recent one on <t:${a.lastPost}:f>.`;
+        }
+        return `
+> In <#${a.channel}>(thread ${a.name}, ${a.type}) : ${a.posts} ${a.posts.length === 1 ? "post" : "posts"}, with the most recent one on <t:${a.lastPost}:f>.`;
+    });
+    return `
+${guildMember.displayName}'s activity, over the last ${days} days:${activity.join("")}
+`;
+};
+
+const getGuildMembersAndChannels = async(guild, memberId) => {
+    let error;
+    let guildMembers;
+    let channels;
+
+    [error, guildMembers] = await to(guild.members.fetch(memberId));
+    if (error) {
+        return `Unable to get user(s) from server:
+\`\`\`
+${error.stack}
+\`\`\`
+`;
+    }
+
+    [error, channels] = await to(guild.channels.fetch());
+    if (error) {
+        return `Unable to get channels from server:
+\`\`\`
+${error.stack}
+\`\`\`
+`;
+    }
+
+    return { guildMembers, channels };
 };
 
 const getUserActivity = async (user, channels, dateToCheck) => {
     const activity = [];
 
     for (const channel of channels.filter(c => c.type === "GUILD_TEXT").values()) {
+        console.info(`Checking channel ${channel.name}`);
         const channelActivity = await getUserMessages(channel, user, dateToCheck);
-        activity.push(...channelActivity);
+        channelActivity.type = "c";
+        activity.push(channelActivity);
 
         const activeThreads = await channel.threads.fetchActive();
         const archivedThreads = await channel.threads.fetchArchived();
         const threads = [...activeThreads.threads.values(), ...archivedThreads.threads.values()];
         for (const thread of threads) {
+            console.info(`Checking thread ${thread.name}`);
             const threadActivity = await getUserMessages(thread, user, dateToCheck);
-            activity.push(...threadActivity);
+            threadActivity.type = thread.archived ? "archived" : "active";
+            threadActivity.name = thread.name;
+            activity.push(threadActivity);
         }
     }
 
@@ -134,25 +170,36 @@ const getUserActivity = async (user, channels, dateToCheck) => {
 };
 
 const getUserMessages = async (channelOrThread, user, dateToCheck) => {
-    const activity = [];
+    let [error, fetchedMessages] = await to(channelOrThread.messages.fetch({ limit: 100 }));
 
-    const permissions = channelOrThread.permissionsFor(user);
-    if (!permissions.has(Permissions.FLAGS.SEND_MESSAGES)) {
-        return activity;
+    if (error) {
+        throw `Unable to get messages from channel/thread: <#${channelOrThread.id}> (${error.path}):
+\`\`\`
+${error.stack}
+\`\`\`
+`;
     }
 
-    const messages = [...(await channelOrThread.messages.fetch()).filter(m => messageFilter(m, user.id, dateToCheck)).values()];
+    let messages = [...fetchedMessages.values()];
 
-    if (messages.length) {
-        const latestMessage = Math.max.apply(null, messages.map(m => m).map(m => m.createdTimestamp));
-        activity.push({
-            channel: channelOrThread.id,
-            posts: messages.length,
-            lastPost: moment(latestMessage).unix()
-        });
+    let atLimit = messages.length === 100;
+    let oldestMessage = messages.at(-1);
+
+    while (atLimit && oldestMessage.createdTimestamp >= dateToCheck) {
+        fetchedMessages = await channelOrThread.messages.fetch({ limit: 100, before: oldestMessage.id });
+        atLimit = fetchedMessages.size === 100;
+        oldestMessage = fetchedMessages.at(- 1);
+        messages = messages.concat([...fetchedMessages.values()]);
     }
 
-    return activity;
+    const userMessages = [...messages.filter(m => messageFilter(m, user.id, dateToCheck)).values()];
+
+    const latestMessage = userMessages[0] ? userMessages[0].createdTimestamp : undefined;
+    return {
+        channel: channelOrThread.id,
+        posts: userMessages.length,
+        lastPost: latestMessage ? moment(latestMessage).unix() : undefined
+    };
 };
 
 const messageFilter = (message, userId, dateToCheck) => message.author.id === userId && message.createdTimestamp >= dateToCheck;
@@ -167,15 +214,25 @@ module.exports = {
         }
 
         await interaction.deferReply("Getting user activity. This might take some time.");
+        const guild = interaction.client.guilds.cache.get(guildId);
+        const days = interaction.options.getInteger("days");
+        const dateToCheck = moment().startOf("day").subtract(days, "days").valueOf();
+
+        let response = "";
+        let error;
 
         if (interaction.options.getSubcommand() === "all") {
-            return getInactiveUsers(interaction);
+            [error, response] = await to(getInactiveUsers(guild, interaction.options.getInteger("posts"), days, dateToCheck));
         }
         if (interaction.options.getSubcommand() === "user") {
-            return checkUserActivity(interaction);
+            [error, response] = await to(checkUserActivity(guild, interaction.options.getUser("value"), days, dateToCheck));
         }
-        // shut resharper up
-        return 0;
+
+        if (error) {
+            interaction.editReply(error);
+        } else {
+            interaction.editReply(response);
+        }
     },
     permissions: [
         {
