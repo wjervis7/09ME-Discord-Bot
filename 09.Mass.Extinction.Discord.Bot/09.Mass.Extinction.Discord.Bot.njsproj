@@ -48,12 +48,16 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Content Include="timezones.json" />
+    <Content Include="utilities\asyncHelpers.js">
+      <SubType>Code</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="data\entities\" />
     <Folder Include="events\" />
     <Folder Include="data\" />
     <Folder Include="commands\" />
+    <Folder Include="utilities\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
 </Project>
