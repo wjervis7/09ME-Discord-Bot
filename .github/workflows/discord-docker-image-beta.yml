@@ -1,4 +1,4 @@
-name: Publish Docker Image for wjervis7/09me-discord
+name: publish wjervis7/09me-discord:beta
 
 on:
   push:
