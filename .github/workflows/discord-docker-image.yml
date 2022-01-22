@@ -34,18 +34,17 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
-        id: branch
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=branch::${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
         
-      - name: Branch name
-        run: echo running on branch ${GITHUB_REF##*/}
+      - name: Check output
+        run: echo ${{ steps.vars.outputs.branch }}
       
       - name: Build and push Docker image
         uses: docker/build-push-action@v2.8.0
         with:
           context: 09.Mass.Extinction.Discord.Bot
-          push: ${{ steps.branch.outputs.branch != 'master' }} 
+          push: ${{ steps.vars.outputs.branch == 'master' }} 
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}  
