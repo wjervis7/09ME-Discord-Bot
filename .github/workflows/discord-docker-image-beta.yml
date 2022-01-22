@@ -31,14 +31,19 @@ jobs:
           images: wjervis7/09me-discord
           tags: |
             type=ref,event=tag
-            type=semver,pattern={{version}}
-            type=ref,event=tag,enable=true,priority=600
             type=raw,value=beta,enable=true
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+        id: branch
       
       - name: Build and push Docker image
         uses: docker/build-push-action@v2.8.0
         with:
           context: 09.Mass.Extinction.Discord.Bot
-          push: true
+          push: ${{ steps.branch.outputs.branch != 'dev' }} 
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}  
