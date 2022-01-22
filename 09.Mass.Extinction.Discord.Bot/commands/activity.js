@@ -46,7 +46,10 @@ const allowedChannels = restrictions.find(r => r.command === command.name).chann
 
 // gets all users that haven't made x number of posts, in the last y number of days.
 const getInactiveUsers = async (guild, posts, days, dateToCheck) => {
-    const [error, { guildMembers, channels }] = await to(getGuildMembersAndChannels(guild));
+    let error;
+    let guildMembers;
+    let channels;
+    [error, { guildMembers, channels }] = await to(getGuildMembersAndChannels(guild));
     if (error) {
         return error;
     }
@@ -56,12 +59,22 @@ const getInactiveUsers = async (guild, posts, days, dateToCheck) => {
     const daysText = days === 1 ? "day" : "days";
     const postsText = posts === 1 ? "post" : "posts";
 
+    const errors = new Set();
+
     for (const member of guildMembers.values()) {
         if (member.user.bot) {
             continue;
         }
+        console.info(`Checking user ${member.displayName}`);
 
-        const userActivity = await getUserActivity(member, channels, dateToCheck);
+        let userActivity;
+
+        [error, userActivity] = await to(getUserActivity(member, channels, dateToCheck, errors));
+
+        if (error) {
+            return error;
+        }
+
         const totalPosts = userActivity.reduce((sum, c) => sum + c.posts, 0);
         if (totalPosts === 0) {
             inactiveUsers.push(`
@@ -74,14 +87,24 @@ const getInactiveUsers = async (guild, posts, days, dateToCheck) => {
         }
     }
 
+    let errorMessage = "";
+
+    if (errors.size) {
+        errorMessage = `
+I am unable to access the following channels/threads:${[...errors].map(e => `
+<#${e}>`).join("")}`;
+    }
+
     if (!inactiveUsers.length) {
-        return `All users have made at least ${posts} ${postsText}, within the last ${days} ${daysText}.`;
+        return `All users have made at least ${posts} ${postsText}, within the last ${days} ${daysText}.
+${errorMessage}`;
     }
 
     const inactiveUsersText = `${inactiveUsers.length} ${inactiveUsers.length === 1 ? "user has" : "users have"}`;
 
     return `
-${inactiveUsersText} not made ${posts} ${postsText}, within the last ${days} ${daysText}:${inactiveUsers.join("")}`;
+${inactiveUsersText} not made ${posts} ${postsText}, within the last ${days} ${daysText}:${inactiveUsers.join("")}
+${errorMessage}`;
 };
 
 // counts number of posts made, by user, in the last x number of days.
@@ -96,15 +119,27 @@ const checkUserActivity = async (guild, user, days, dateToCheck) => {
         return error;
     }
 
-    [error, activity] = await to(getUserActivity(user, channels, dateToCheck));
+    const errors = new Set();
+
+    [error, activity] = await to(getUserActivity(user, channels, dateToCheck, errors));
+
     if (error) {
         return error;
+    }
+
+    let errorMessage = "";
+
+    if (errors.size) {
+        errorMessage = `
+I am unable to access the following channels:${[...errors].map(e => `
+<#${e}>`).join("")}`;
     }
 
     activity = activity.filter(a => a.posts > 0);
 
     if (!activity.length) {
-        return `${guildMember.displayName} has not made any posts, in the last ${days} days.`;
+        return `${guildMember.displayName} has not made any posts, in the last ${days} days.
+${errorMessage}`;
     }
     activity = activity.map(a => {
         if (a.type === "c") {
@@ -116,7 +151,7 @@ const checkUserActivity = async (guild, user, days, dateToCheck) => {
     });
     return `
 ${guildMember.displayName}'s activity, over the last ${days} days:${activity.join("")}
-`;
+${errorMessage}`;
 };
 
 const getGuildMembersAndChannels = async(guild, memberId) => {
@@ -145,12 +180,27 @@ ${error.stack}
     return { guildMembers, channels };
 };
 
-const getUserActivity = async (user, channels, dateToCheck) => {
+const getUserActivity = async (user, channels, dateToCheck, errors) => {
     const activity = [];
 
     for (const channel of channels.filter(c => c.type === "GUILD_TEXT").values()) {
+        if (errors.has(channel.id)) {
+            console.info(`Channel ${channel.name} has errored before; skipping channel.`);
+            continue;
+        }
+
         console.info(`Checking channel ${channel.name}`);
-        const channelActivity = await getUserMessages(channel, user, dateToCheck);
+
+        let error;
+        let channelActivity;
+
+        [error, channelActivity] = await to(getUserMessages(channel, user, dateToCheck));
+
+        if (error) {
+            errors.add(channel.id);
+            continue;
+        }
+
         channelActivity.type = "c";
         activity.push(channelActivity);
 
@@ -158,8 +208,22 @@ const getUserActivity = async (user, channels, dateToCheck) => {
         const archivedThreads = await channel.threads.fetchArchived();
         const threads = [...activeThreads.threads.values(), ...archivedThreads.threads.values()];
         for (const thread of threads) {
+            if (errors.has(thread.id)) {
+                console.info(`Thread ${thread.name} has errored before; skipping thread.`);
+                continue;
+            }
+
             console.info(`Checking thread ${thread.name}`);
-            const threadActivity = await getUserMessages(thread, user, dateToCheck);
+
+            let threadActivity;
+
+            [error, threadActivity] = await to(getUserMessages(thread, user, dateToCheck));
+
+            if (error) {
+                errors.add(thread.id);
+                continue;
+            }
+
             threadActivity.type = thread.archived ? "archived" : "active";
             threadActivity.name = thread.name;
             activity.push(threadActivity);
