@@ -1,7 +1,12 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const moment = require("moment");
 const { to } = require("../utilities/asyncHelpers.js");
-const { guildId, restrictions } = require("../config.json");
+const { guildId, restrictions, activitySettings: { excludedChannels, excludedUsers } } = require("../config.json");
+
+const cache = {
+    lastInsert: null,
+    messages: {}
+};
 
 const command = new SlashCommandBuilder()
     .setName("activity")
@@ -65,6 +70,12 @@ const getInactiveUsers = async (guild, posts, days, dateToCheck) => {
         if (member.user.bot) {
             continue;
         }
+
+        if (excludedUsers.includes(member.user.id)) {
+            console.info(`User is in exclusion list; skipping user ${member.displayName}.`);
+            continue;
+        }
+
         console.info(`Checking user ${member.displayName}`);
 
         let userActivity;
@@ -189,6 +200,11 @@ const getUserActivity = async (user, channels, dateToCheck, errors) => {
             continue;
         }
 
+        if (excludedChannels.includes(channel.id)) {
+            console.info(`Channel is in exclusion list; skipping channel ${channel.name}.`);
+            continue;
+        }
+
         console.info(`Checking channel ${channel.name}`);
 
         let error;
@@ -244,16 +260,29 @@ ${error.stack}
 `;
     }
 
-    let messages = [...fetchedMessages.values()];
+    let messages;
+    const cacheKey = `${channelOrThread.id}.${dateToCheck}`;
 
-    let atLimit = messages.length === 100;
-    let oldestMessage = messages.at(-1);
+    if (cache.lastInsert && moment().isBefore(cache.lastInsert) && cache.messages[cacheKey]) {
+        messages = cache.messages[cacheKey];
+        console.info("Using cached messages.");
+    } else {
+        console.info("No cached messages, or cache is old.  Getting new messages.");
+        messages = [...fetchedMessages.values()];
 
-    while (atLimit && oldestMessage.createdTimestamp >= dateToCheck) {
-        fetchedMessages = await channelOrThread.messages.fetch({ limit: 100, before: oldestMessage.id });
-        atLimit = fetchedMessages.size === 100;
-        oldestMessage = fetchedMessages.at(- 1);
-        messages = messages.concat([...fetchedMessages.values()]);
+        let atLimit = messages.length === 100;
+        let oldestMessage = messages.at(-1);
+
+        while (atLimit && oldestMessage.createdTimestamp >= dateToCheck) {
+            fetchedMessages = await channelOrThread.messages.fetch({ limit: 100, before: oldestMessage.id });
+            atLimit = fetchedMessages.size === 100;
+            oldestMessage = fetchedMessages.at(- 1);
+            messages = messages.concat([...fetchedMessages.values()]);
+        }
+
+        console.info("Adding messages to cache.");
+        cache.lastInsert = moment().add(15, "minutes");
+        cache.messages[cacheKey] = messages;
     }
 
     const userMessages = [...messages.filter(m => messageFilter(m, user.id, dateToCheck)).values()];
