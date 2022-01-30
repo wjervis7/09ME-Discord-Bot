@@ -1,6 +1,8 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
+const { SlashCommandBuilder, Embed } = require("@discordjs/builders");
 const moment = require("moment");
 const { to } = require("../utilities/asyncHelpers.js");
+const { sleep } = require("../utilities/helpers.js");
+const Logger = require("../utilities/logging.js");
 const Context = require("../data/context.js");
 const { restrictions, activitySettings: { excludedChannels, excludedUsers } } = require("../config.json");
 
@@ -69,17 +71,21 @@ const getInactiveUsers = async (guild, posts, days, dateToCheck) => {
 
     const errors = new Set();
 
-    for (const member of guildMembers.values()) {
+    const memberCount = guildMembers.length;
+    let user = 0;
+    for (const member of guildMembers) {
+        Logger.logInformation(`Processing user ${++user}/${memberCount}.`);
+
         if (member.user.bot) {
             continue;
         }
 
         if (excludedUsers.includes(member.user.id)) {
-            console.info(`User is in exclusion list; skipping user ${member.displayName}.`);
+            Logger.logVerbose(`User is in exclusion list; skipping user ${member.displayName}.`);
             continue;
         }
 
-        console.info(`Checking user ${member.displayName}`);
+        Logger.logVerbose(`Checking user ${member.displayName}`);
 
         let userActivity;
 
@@ -134,6 +140,7 @@ const checkUserActivity = async (guild, user, days, dateToCheck) => {
     }
 
     const errors = new Set();
+    Logger.logInformation(`Processing user ${guildMember.nickname || guildMember.user.username}`);
 
     [error, activity] = await to(getUserActivity(user, channels, dateToCheck, errors));
 
@@ -191,7 +198,7 @@ ${error.stack}
 `;
     }
 
-    return { guildMembers, channels };
+    return { guildMembers: memberId ? guildMembers : [...guildMembers.values()], channels: [...channels.values()] };
 };
 
 const getUserActivity = async (user, channels, dateToCheck, errors) => {
@@ -199,16 +206,16 @@ const getUserActivity = async (user, channels, dateToCheck, errors) => {
 
     for (const channel of channels.filter(c => c.type === "GUILD_TEXT").values()) {
         if (errors.has(channel.id)) {
-            console.info(`Channel ${channel.name} has errored before; skipping channel.`);
+            Logger.logVerbose(`Channel ${channel.name} has errored before; skipping channel.`);
             continue;
         }
 
         if (excludedChannels.includes(channel.id)) {
-            console.info(`Channel is in exclusion list; skipping channel ${channel.name}.`);
+            Logger.logVerbose(`Channel is in exclusion list; skipping channel ${channel.name}.`);
             continue;
         }
 
-        console.info(`Checking channel ${channel.name}`);
+        Logger.logVerbose(`Checking channel ${channel.name}`);
 
         let error;
         let channelActivity;
@@ -228,11 +235,11 @@ const getUserActivity = async (user, channels, dateToCheck, errors) => {
         const threads = [...activeThreads.threads.values(), ...archivedThreads.threads.values()];
         for (const thread of threads) {
             if (errors.has(thread.id)) {
-                console.info(`Thread ${thread.name} has errored before; skipping thread.`);
+                Logger.logVerbose(`Thread ${thread.name} has errored before; skipping thread.`);
                 continue;
             }
 
-            console.info(`Checking thread ${thread.name}`);
+            Logger.logVerbose(`Checking thread ${thread.name}`);
 
             let threadActivity;
 
@@ -268,9 +275,9 @@ ${error.stack}
 
     if (cache.lastInsert && moment().isBefore(cache.lastInsert) && cache.messages[cacheKey]) {
         messages = cache.messages[cacheKey];
-        console.info("Using cached messages.");
+        Logger.logVerbose("Using cached messages.");
     } else {
-        console.info("No cached messages, or cache is old.  Getting new messages.");
+        Logger.logVerbose("No cached messages, or cache is old.  Getting new messages.");
         messages = [...fetchedMessages.values()];
 
         let atLimit = messages.length === 100;
@@ -283,7 +290,7 @@ ${error.stack}
             messages = messages.concat([...fetchedMessages.values()]);
         }
 
-        console.info("Adding messages to cache.");
+        Logger.logVerbose("Adding messages to cache.");
         cache.lastInsert = moment().add(15, "minutes");
         cache.messages[cacheKey] = messages;
     }
@@ -344,21 +351,31 @@ module.exports = {
 
         const endTime = moment().toISOString();
 
-        if (!timedOut) {
-            clearTimeout(timeOut);
-            if (error) {
-                interaction.editReply(error);
-            } else {
-                interaction.editReply(response);
-            }
-        }
-
-        await channel.send(`<@${interaction.user.id}>, the activity report has finished:
-${response}`);
+        response = response
+            ? response
+            : error
+            ? `${error.message}:
+    ${error.stack}`
+            : "Error, no content.";
 
         type = type === "all" ? `All Users` : `Single User`;
 
-        await context.addActivityReport(interaction.user.id, startTime, endTime, type, JSON.stringify(args), response || error || "Error, no content.");
+        await context.addActivityReport(interaction.user.id, startTime, endTime, type, JSON.stringify(args), response);
+
+        if (!timedOut) {
+            clearTimeout(timeOut);
+            if (error) {
+                interaction.editReply(error.message);
+            } else {
+                interaction.editReply(response);
+            }
+        } else {
+
+            const message = new Embed()
+                .addField({ name: "Activity Report", value: response });
+
+            await channel.send({ embeds: [message] });
+        }
     },
     permissions: [
         {
