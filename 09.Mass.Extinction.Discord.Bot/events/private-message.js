@@ -1,4 +1,5 @@
 const Context = require("../data/context.js");
+const Logger = require("../utilities/logging.js");
 const { guildId, channelId } = require("../config.json");
 const context = new Context();
 
@@ -45,11 +46,11 @@ module.exports = {
                     const collector = reply.createReactionCollector({ filter, time: 15_000 });
                     collector.on("collect", async(reaction) => {
                         const isAnonymous = reaction.emoji.name === "🇾";
-                        console.log(`Message is anonymous: ${isAnonymous}.`);
+                        Logger.logInformation(`Message is anonymous: ${isAnonymous}.`);
                         const sender = `${username}#${discriminator}`;
                         try {
                             const newMessage = await context.createMessage(sender, content, isAnonymous);
-                            console.log(newMessage);
+                            Logger.logVerbose(newMessage);
 
                             if (isAnonymous) {
                                 await channel.send(`Anonymous message received:\n>>> ${content}`);
@@ -60,11 +61,11 @@ module.exports = {
                             collector.stop();
                             await reply.channel.send(messageSentText);
                         } catch (collectorError) {
-                            console.error("An error has occurred :(", collectorError);
+                            Logger.logError("An error has occurred :(", collectorError);
                         }
                     });
                 } catch (error) {
-                    console.error("An error has occurred :(.", error);
+                    Logger.logError("An error has occurred :(.", error);
                 }
             });
     }

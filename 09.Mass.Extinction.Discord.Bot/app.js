@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { Client, Collection, Intents } = require("discord.js");
 const commandHelper = require("./deploy-commands.js");
+const Logger = require("./utilities/logging.js");
 const { token } = require("./config.json");
 
 const client = new Client({
@@ -16,7 +17,7 @@ for (const file of commandFiles) {
 }
 
 client.once("ready", async () => {
-    console.log("Client is ready.");
+    Logger.logInformation("Client is ready.");
 
     // deploy slash commands
     await commandHelper.deployCommands();
@@ -28,7 +29,7 @@ client.once("ready", async () => {
     const events = fs.readdirSync("./events").filter(file => file.endsWith(".js"));
     for (const file of events) {
         const event = require(`./events/${file}`);
-        console.log(`Starting event handler '${event.name}'.`);
+        Logger.logInformation(`Starting event handler '${event.name}'.`);
         event.listen(client);
     }
 });
@@ -43,7 +44,7 @@ client.on("interactionCreate", async interaction => {
     try {
         await command.execute(interaction);
     } catch (error) {
-        console.error(error);
+        Logger.logError(error);
         const message = "There was an error while executing this command!";
         if (interaction.deferred && interaction.ephemeral) {
             interaction.editReply({ content: message, ephemeral: true });

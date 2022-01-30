@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const moment = require("moment-timezone");
 const Context = require("../data/context.js");
+const Logger = require("../utilities/logging.js");
 const context = new Context();
 
 const invalidTimeMessage = `The time you provided, is not a valid time format.`;
@@ -32,8 +33,8 @@ module.exports = {
         const userId = interaction.user.id;
         const userTimezone = await context.getDiscordUserTimeZone(userId);
         const allTimezones = (await context.getTimeZones()).filter(tz => tz !== userTimezone);
-        console.log(userTimezone);
-        console.log(allTimezones);
+        Logger.logInformation(userTimezone);
+        Logger.logInformation(allTimezones);
 
         moment.tz.setDefault(userTimezone);
         let m = moment(time);
@@ -43,7 +44,7 @@ module.exports = {
                 interaction.reply(invalidTimeMessage);
             }
         }
-        console.log(m.format());
+        Logger.logVerbose(m.format());
 
         let momentFormat = "";
         switch (format) {

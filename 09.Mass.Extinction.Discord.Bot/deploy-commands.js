@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
+const Logger = require("./utilities/logging.js");
 const { clientId, guildId, token, adminRole } = require("./config.json");
 
 const commands = [];
@@ -19,21 +20,21 @@ const rest = new REST({ version: "9" }).setToken(token);
 
 const deployCommands = (async () => {
     try {
-        console.log("Started refreshing slash commands.");
+        Logger.logInformation("Started refreshing slash commands.");
         const body = commands.map(c => c.data);
         await rest.put(
             Routes.applicationGuildCommands(clientId, guildId),
             { body }
         );
 
-        console.log("Successfully reloaded slash commands.");
+        Logger.logInformation("Successfully reloaded slash commands.");
     } catch (error) {
-        console.error(error);
+        Logger.logError(error);
     }
 });
 
 const setPermissions = (async(client) => {
-    console.log("Starting setting permissions for slash commands.");
+    Logger.logInformation("Starting setting permissions for slash commands.");
     const guild = client.guilds.cache.get(guildId);
     const everyone = guild.roles.everyone.id;
 
@@ -66,7 +67,7 @@ const setPermissions = (async(client) => {
         await cmd.permissions.set({ permissions });
     }
 
-    console.log("Successfully set permissions for slash commands.");
+    Logger.logInformation("Successfully set permissions for slash commands.");
 });
 
 module.exports.deployCommands = deployCommands;

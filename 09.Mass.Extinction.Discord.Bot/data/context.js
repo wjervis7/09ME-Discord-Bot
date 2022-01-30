@@ -2,6 +2,7 @@ const { Sequelize } = require("sequelize");
 const Message = require("./entities/Message.js");
 const DiscordUser = require("./entities/DiscordUser.js");
 const ActivityReport = require("./entities/ActivityReport.js");
+const Logger = require("../utilities/logging.js");
 const { DB_NAME: dbName, DB_USER: user, DB_PASS: password, DB_HOST: host, DB_PORT: port } = require("../config.json");
 
 const sequelize = new Sequelize(dbName, user, password, {
@@ -46,9 +47,9 @@ ActivityReport.init(
 (async () => {
     try {
         await sequelize.authenticate();
-        console.log("Connection established.");
+        Logger.logInformation("Connection established.");
     } catch (error) {
-        console.error("Unable to connect to the database:", error);
+        Logger.logError("Unable to connect to the database:", error);
     }
 })();
 
