@@ -57,13 +57,13 @@ jobs:
         with:
           context: 09.Mass.Extinction.Discord.Bot
           push: ${{ steps.vars.outputs.branch == 'dev' }} 
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}  
+          tags: ${{ steps.meta-bot.outputs.tags }}
+          labels: ${{ steps.meta-bot.outputs.labels }}  
           
       - name: Build and push Docker image - web
         uses: docker/build-push-action@v2.8.0
         with:
           context: 09.Mass.Extinction.Discord.Web
           push: ${{ steps.vars.outputs.branch == 'dev' }} 
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}  
+          tags: ${{ steps.meta-web.outputs.tags }}
+          labels: ${{ steps.meta-web.outputs.labels }}  
