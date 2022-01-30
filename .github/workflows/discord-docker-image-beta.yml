@@ -1,4 +1,4 @@
-name: publish wjervis7/09me-discord:beta
+name: publish beta images
 
 on:
   push:
@@ -63,7 +63,7 @@ jobs:
       - name: Build and push Docker image - web
         uses: docker/build-push-action@v2.8.0
         with:
-          context: 09.Mass.Extinction.Discord.Web
+          context: 09.Mass.Extinction.Web
           push: ${{ steps.vars.outputs.branch == 'dev' }} 
           tags: ${{ steps.meta-web.outputs.tags }}
           labels: ${{ steps.meta-web.outputs.labels }}  
