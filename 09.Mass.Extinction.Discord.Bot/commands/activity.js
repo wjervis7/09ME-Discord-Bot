@@ -1,7 +1,7 @@
-const { SlashCommandBuilder, Embed } = require("@discordjs/builders");
+const { SlashCommandBuilder } = require("@discordjs/builders");
 const moment = require("moment");
 const { to } = require("../utilities/asyncHelpers.js");
-const { sleep } = require("../utilities/helpers.js");
+//const { sleep } = require("../utilities/helpers.js"); // testing interactions > 15 minutes
 const Logger = require("../utilities/logging.js");
 const Context = require("../data/context.js");
 const { restrictions, activitySettings: { excludedChannels, excludedUsers } } = require("../config.json");
@@ -307,6 +307,24 @@ ${error.stack}
 
 const messageFilter = (message, userId, dateToCheck) => message.author.id === userId && message.createdTimestamp >= dateToCheck;
 
+const sendMessageInChunks = async (channel, message, chunkSize) => {
+    const chunks = [];
+
+    while (message.length >= chunkSize) {
+        const chunk = message.substr(0, chunkSize);
+        const i = chunk.lastIndexOf(`
+`);
+        chunks.push(chunk.slice(0, i));
+        message = message.slice(i);
+    }
+
+    chunks.push(message); // last chunk that is < chunkSize
+
+    for (const chunk of chunks) {
+        await channel.send(chunk);
+    }
+}
+
 module.exports = {
     name: command.name,
     data: command,
@@ -370,11 +388,10 @@ module.exports = {
                 interaction.editReply(response);
             }
         } else {
+            response = `The activity report has finished:
+${response}`;
 
-            const message = new Embed()
-                .addField({ name: "Activity Report", value: response });
-
-            await channel.send({ embeds: [message] });
+            await sendMessageInChunks(channel, response, 200);
         }
     },
     permissions: [
