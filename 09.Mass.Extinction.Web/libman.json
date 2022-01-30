@@ -10,29 +10,17 @@
             "library": "twitter-bootstrap@5.1.1",
             "destination": "wwwroot/lib/bootstrap/",
             "files": [
-                "js/bootstrap.bundle.js",
-                "js/bootstrap.bundle.js.map",
-                "js/bootstrap.bundle.min.js",
-                "js/bootstrap.bundle.min.js.map",
-                "js/bootstrap.esm.js",
-                "js/bootstrap.esm.js.map",
-                "js/bootstrap.esm.min.js",
-                "js/bootstrap.esm.min.js.map",
-                "js/bootstrap.js",
-                "js/bootstrap.js.map",
-                "js/bootstrap.min.js",
-                "js/bootstrap.min.js.map"
+              "js/*.js",
+              "js/*.js.map"
             ]
         },
         {
             "library": "jquery-validate@1.19.2",
             "destination": "wwwroot/lib/jquery-validate/",
-            "files": [
-                "additional-methods.js",
-                "additional-methods.min.js",
-                "jquery.validate.js",
-                "jquery.validate.min.js"
-            ]
+          "files": [
+            "*.js",
+            "*.js.map"
+          ]
         },
         {
             "library": "jquery-validation-unobtrusive@3.2.12",
@@ -41,6 +29,19 @@
         {
             "library": "moment.js@2.29.1",
             "destination": "wwwroot/lib/moment.js/"
+        },
+        {
+            "library": "vue@2.6.14",
+            "destination": "wwwroot/lib/vue/"
+        },
+        {
+            "library": "vuetify@2.6.2",
+            "destination": "wwwroot/lib/vuetify/",
+            "files": [
+                "*.js",
+                "*.js.map",
+                "json/*.json"
+            ] 
         }
     ]
 }

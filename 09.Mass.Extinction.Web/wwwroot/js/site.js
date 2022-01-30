@@ -9,3 +9,52 @@
         $(el).text(m.local().format("llll"));
     });
 })(jQuery, moment);
+
+const initializeDataTable = (headers, data) => new Vue({
+    data() {
+        return {
+            expanded: [],
+            singleExpand: false,
+            headers,
+            data
+        };
+    },
+    vuetify: new Vuetify()
+});
+
+// activity reports
+(() => {
+    const initializeActivityReports = (data) => {
+        data = data.map(d => {
+            const args = JSON.parse(d.args);
+            d.args = args;
+            return d;
+        });
+
+        const app = initializeDataTable([
+                {
+                    text: "Report Type",
+                    align: "start",
+                    value: "reportType"
+                },
+                { text: "Initiator", value: "initiator" },
+                { text: "Start Time", value: "startTime" },
+                { text: "End Time", value: "End Time" }
+            ],
+            data.map(d => {
+                const args = d.args;
+                d.args = Object.entries(args).map(entry => {
+                    return {
+                        key: entry[0],
+                        value:
+                            entry[1]
+                    };
+                });
+                return d;
+            }));
+
+        app.$mount("#app");
+    };
+
+    window.initializeActivityReports = initializeActivityReports;
+})();

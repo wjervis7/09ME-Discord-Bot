@@ -1,6 +1,7 @@
 const { Sequelize } = require("sequelize");
 const Message = require("./entities/Message.js");
 const DiscordUser = require("./entities/DiscordUser.js");
+const ActivityReport = require("./entities/ActivityReport.js");
 const { DB_NAME: dbName, DB_USER: user, DB_PASS: password, DB_HOST: host, DB_PORT: port } = require("../config.json");
 
 const sequelize = new Sequelize(dbName, user, password, {
@@ -31,6 +32,14 @@ DiscordUser.init(
     {
         sequelize,
         tableName: "DiscordUsers"
+    }
+);
+
+ActivityReport.init(
+    ActivityReport.sequelizeInit(),
+    {
+        sequelize,
+        tableName: "ActivityReports"
     }
 );
 
@@ -69,6 +78,18 @@ class Context {
     async getTimeZones() {
         const discordUsers = await DiscordUser.findAll({ attributes: ["timeZone"] });
         return [... new Set(discordUsers.map(discordUser => discordUser.timeZone))];
+    }
+
+    async addActivityReport(initiator, startTime, endTime, type, args, report) {
+        const r = await ActivityReport.create({
+            initiator,
+            startTime: startTime,
+            endTime: endTime,
+            reportType: type,
+            args,
+            report
+        });
+        return r;
     }
 }
 
