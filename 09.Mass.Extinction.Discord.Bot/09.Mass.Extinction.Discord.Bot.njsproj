@@ -39,6 +39,7 @@
     <Content Include="commands\activity.js" />
     <Content Include="config.json" />
     <Content Include="data\context.js" />
+    <Content Include="data\entities\ActivityReport.js" />
     <Content Include="data\entities\Message.js" />
     <Content Include="data\entities\DiscordUser.js" />
     <Content Include="deploy-commands.js" />
@@ -49,6 +50,9 @@
     <Content Include="README.md" />
     <Content Include="timezones.json" />
     <Content Include="utilities\asyncHelpers.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="utilities\helpers.js">
       <SubType>Code</SubType>
     </Content>
   </ItemGroup>

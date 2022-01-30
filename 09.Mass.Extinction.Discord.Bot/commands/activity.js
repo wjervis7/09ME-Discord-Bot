@@ -1,12 +1,15 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const moment = require("moment");
 const { to } = require("../utilities/asyncHelpers.js");
-const { guildId, restrictions, activitySettings: { excludedChannels, excludedUsers } } = require("../config.json");
+const Context = require("../data/context.js");
+const { restrictions, activitySettings: { excludedChannels, excludedUsers } } = require("../config.json");
 
 const cache = {
     lastInsert: null,
     messages: {}
 };
+
+const context = new Context();
 
 const command = new SlashCommandBuilder()
     .setName("activity")
@@ -306,26 +309,56 @@ module.exports = {
             return;
         }
 
+        // 14 minutes 30 seconds
+        const time = (14 * 60 * 1000) + (30 * 1000);
+        let timedOut = false;
+        const timeOut = setTimeout(() => {
+                interaction.editReply("This report is taking too long. I'll send a message, to this channel, once it is complete.");
+                timedOut = true;
+            },
+            time
+        );
+
+        const channel = interaction.channel;
         await interaction.deferReply("Getting user activity. This might take some time.");
-        const guild = interaction.client.guilds.cache.get(guildId);
+        const startTime = moment().toISOString();
+        const guild = interaction.guild;
         const days = interaction.options.getInteger("days");
         const dateToCheck = moment().startOf("day").subtract(days, "days").valueOf();
+        let type = interaction.options.getSubcommand();
+        const args = { days };
 
         let response = "";
         let error;
 
-        if (interaction.options.getSubcommand() === "all") {
-            [error, response] = await to(getInactiveUsers(guild, interaction.options.getInteger("posts"), days, dateToCheck));
+        if (type === "all") {
+            const posts = interaction.options.getInteger("posts");
+            args.posts = posts;
+            [error, response] = await to(getInactiveUsers(guild, posts, days, dateToCheck));
         }
-        if (interaction.options.getSubcommand() === "user") {
-            [error, response] = await to(checkUserActivity(guild, interaction.options.getUser("value"), days, dateToCheck));
+        if (type === "user") {
+            const user = interaction.options.getUser("value");
+            args.user = user.id;
+            [error, response] = await to(checkUserActivity(guild, user, days, dateToCheck));
         }
 
-        if (error) {
-            interaction.editReply(error);
-        } else {
-            interaction.editReply(response);
+        const endTime = moment().toISOString();
+
+        if (!timedOut) {
+            clearTimeout(timeOut);
+            if (error) {
+                interaction.editReply(error);
+            } else {
+                interaction.editReply(response);
+            }
         }
+
+        await channel.send(`<@${interaction.user.id}>, the activity report has finished:
+${response}`);
+
+        type = type === "all" ? `All Users` : `Single User`;
+
+        await context.addActivityReport(interaction.user.id, startTime, endTime, type, JSON.stringify(args), response || error || "Error, no content.");
     },
     permissions: [
         {

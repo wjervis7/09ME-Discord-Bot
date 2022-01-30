@@ -1,0 +1,43 @@
+﻿@model IEnumerable<_09.Mass.Extinction.Web.ViewModels.ActivityReport>
+
+<div id="app">
+    <template>
+        <v-data-table
+            :headers="headers"
+            :items="data"
+            :single-expand="singleExpand"
+            :expanded.sync="expanded"
+            item-key="id"
+            show-expand
+            @@click:row="(item, slot) => slot.expand(!slot.isExpanded)"
+            dense
+            dark
+            class="elevation-1">
+            <template v-slot:top>
+                <v-toolbar flat>
+                    <v-toolbar-title>Activity Reports</v-toolbar-title>
+                </v-toolbar>
+            </template>
+            <template v-slot:expanded-item="{ headers, item }">
+                <td :colspan="headers.length">
+                    <p>Activity Report:</p>
+                    <p>
+                        <template v-for="arg in item.args">
+                            <span>{{ arg.key }}: </span><span>{{ arg.value }}</span><br />
+                        </template>
+                    </p>
+                    <p style="white-space: pre;" v-html="item.report"></p>
+                </td>
+            </template>
+        </v-data-table>
+    </template>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        const model = @Html.Raw(Json.Serialize(Model));
+        console.info(model);
+        window.initializeActivityReports(model);
+    </script>
+}
