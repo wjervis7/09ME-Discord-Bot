@@ -62,7 +62,8 @@ jobs:
       - name: Build and push Docker image - web
         uses: docker/build-push-action@v2.8.0
         with:
-          context: 09.Mass.Extinction.Web
+          context: .
+          file: 09.Mass.Extinction.Web/Dockerfile
           push: ${{ steps.vars.outputs.branch == 'master' }} 
           tags: ${{ steps.meta-web.outputs.tags }}
           labels: ${{ steps.meta-web.outputs.labels }}  
