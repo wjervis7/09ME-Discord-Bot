@@ -22,12 +22,32 @@ const initializeDataTable = (headers, data) => new Vue({
     vuetify: new Vuetify()
 });
 
+
+// private static readonly Regex _timeRegex = new("(?<=\\<t\\:)(\\d*)(?=\\:f\\>)");
+//const _timeRegex = new RegExp("(?<=\\<t\\:)(\\d*)(?=\\:f\\>)");
+const _timeRegex = /(?<=\<t\:)(\d*)(?=\:f\>)/g;
+
+const replaceTimeFormatsWithDates = report => {
+    let newReport = report;
+    const matches = report.match(_timeRegex);
+    if (!matches) {
+        return newReport;
+    }
+    for (const match of matches) {
+        console.log(match);
+        const m = moment.utc(+match);
+        newReport = newReport.replace(`<t:${match}:f>`, m.local().format("llll"));
+    }
+    return newReport;
+};
+
 // activity reports
 (() => {
     const initializeActivityReports = (data) => {
         data = data.map(d => {
             const args = JSON.parse(d.args);
             d.args = args;
+            d.report = replaceTimeFormatsWithDates(d.report);
             return d;
         });
 

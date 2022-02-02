@@ -63,6 +63,10 @@ public class DiscordService
 
         foreach (var response in responses)
         {
+            if (!response.IsSuccessStatusCode)
+            {
+                continue;
+            }
             var responseStream = await response.Content.ReadAsStreamAsync();
             var discordChannel = await JsonSerializer.DeserializeAsync<DiscordChannel>(responseStream);
             channels.Add(discordChannel);

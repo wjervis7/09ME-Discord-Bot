@@ -227,8 +227,10 @@ const getUserActivity = async (user, channels, dateToCheck, errors) => {
             continue;
         }
 
-        channelActivity.type = "c";
-        activity.push(channelActivity);
+        if (channelActivity.posts > 0) {
+            channelActivity.type = "c";
+            activity.push(channelActivity);
+        }
 
         const activeThreads = await channel.threads.fetchActive();
         const archivedThreads = await channel.threads.fetchArchived();
@@ -250,9 +252,11 @@ const getUserActivity = async (user, channels, dateToCheck, errors) => {
                 continue;
             }
 
-            threadActivity.type = thread.archived ? "archived" : "active";
-            threadActivity.name = thread.name;
-            activity.push(threadActivity);
+            if (threadActivity.posts > 0) {
+                threadActivity.type = thread.archived ? "archived" : "active";
+                threadActivity.name = thread.name;
+                activity.push(threadActivity);
+            }
         }
     }
 
@@ -345,6 +349,7 @@ module.exports = {
         );
 
         const channel = interaction.channel;
+        const userId = interaction.user.id;
         await interaction.deferReply("Getting user activity. This might take some time.");
         const startTime = moment().toISOString();
         const guild = interaction.guild;
@@ -378,7 +383,7 @@ module.exports = {
 
         type = type === "all" ? `All Users` : `Single User`;
 
-        await context.addActivityReport(interaction.user.id, startTime, endTime, type, JSON.stringify(args), response);
+        await context.addActivityReport(userId, startTime, endTime, type, JSON.stringify(args), response);
 
         if (!timedOut) {
             clearTimeout(timeOut);
@@ -391,7 +396,7 @@ module.exports = {
             response = `The activity report has finished:
 ${response}`;
 
-            await sendMessageInChunks(channel, response, 200);
+            await sendMessageInChunks(channel, response, 2000);
         }
     },
     permissions: [
