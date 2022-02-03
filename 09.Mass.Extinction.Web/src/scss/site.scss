@@ -2,4 +2,9 @@
 @import "bootstrap/scss/bootstrap";
 @import "bootswatch";
 
-@import "vuetify/vuetify";
+@import "@mdi/font/scss/materialdesignicons";
+@import "vuetify/dist/vuetify";
+
+.full-width {
+    white-space: nowrap; 
+}

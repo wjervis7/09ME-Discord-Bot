@@ -1,44 +1,57 @@
-﻿@model IEnumerable<_09.Mass.Extinction.Web.Data.Entities.Message>
+﻿@model IEnumerable<_09.Mass.Extinction.Web.ViewModels.AdminMessage>
 
 @{
     ViewData["Title"] = "View Admin Messages";
 }
 
-<h1>View Admin Messages</h1>
+<div id="app" data-app>
+    <template>
+        <v-data-table
+            :headers="headers"
+            :items="data"
+            :single-expand="singleExpand"
+            :expanded.sync="expanded"
+            :search="search"
+            :custom-sort="sortTable"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            item-key="id"
+            show-expand
+            dense
+            dark
+            class="elevation-1">
+            <template v-slot:top>
+                <v-toolbar flat>
+                    <v-toolbar-title>Admin Messages</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-text-field
+                        v-model="search"
+                        append-icon="mdi-magnify"
+                        label="Search"
+                        single-line
+                        hide-details
+                    ></v-text-field>
+                </v-toolbar>
+            </template>
+            <template v-slot:item.data-table-expand="{item, isExpanded, expand }">
+                <button v-if="item.canExpand" type="button" class="v-icon notranslate v-data-table__expand-icon v-icon--link mdi mdi-chevron-down theme--dark"></button>
+            </template>
+            <template v-slot:expanded-item="{ headers, item }">
+                <td :colspan="headers.length">
+                    <p style="white-space: pre;">{{ item.body }}</p>
+                </td>
+            </template>
+        </v-data-table>
+    </template>
+</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Sender)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Body)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateSent)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsAnonymous)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Sender)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Body)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateSent)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsAnonymous)
-            </td>
-        </tr>
+@section Scripts
+{
+    <script type="module">
+        import loadPage from "/js/Discord/adminMessages.js";
+
+        const model = @Html.Raw(Json.Serialize(Model));
+        
+        loadPage(model);
+    </script>
 }
-    </tbody>
-</table>

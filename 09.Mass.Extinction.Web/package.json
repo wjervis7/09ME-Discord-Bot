@@ -1,31 +1,36 @@
 {
-    "name": "09me-web-site",
-    "version": "1.0.0",
-    "description": "Website for 09ME",
-    "scripts": {
-        "css": "npm-run-all css-compile css-prefix css-minify",
-        "css-compile": "sass --style expanded --source-map --embed-sources --no-error-css src/scss/:wwwroot/css/",
-        "css-minify": "npm-run-all --parallel css-minify-*",
-        "css-minify-main": "cleancss -O1 --format breakWith=lf --with-rebase --source-map --source-map-inline-sources --output wwwroot/css/ --batch --batch-suffix \".min\" \"wwwroot/css/*.css\" \"!wwwroot/css/*.min.css\" \"!wwwroot/css/*rtl*.css\"",
-        "css-prefix": "npm-run-all --parallel css-prefix-*",
-        "css-prefix-main": "postcss --config postcss.config.js --replace \"wwwroot/css/*.css\" \"!wwwroot/css/*.rtl*.css\" \"!wwwroot/css/*.min.css\""
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/wjervis7/09ME-Discord-Bot.git"
-    },
-    "author": "Warren Jervis",
-    "bugs": {
-        "url": "https://github.com/wjervis7/09ME-Discord-Bot/issues"
-    },
-    "homepage": "https://github.com/wjervis7/09ME-Discord-Bot#readme",
-    "devDependencies": {
-        "autoprefixer": "^10.2.6",
-        "clean-css-cli": "^5.3.0",
-        "cross-env": "^7.0.3",
-        "npm-run-all": "^4.1.5",
-        "postcss": "^8.3.0",
-        "postcss-cli": "^8.3.1",
-        "sass": "^1.34.1"
-    }
+  "name": "09me-web-site",
+  "version": "1.0.0",
+  "description": "Website for 09ME",
+  "scripts": {
+    "css": "npm-run-all css-compile css-prefix css-minify css-fonts",
+    "css-compile": "sass --style expanded --source-map --embed-sources --no-error-css -I node_modules src/scss/:wwwroot/css/",
+    "css-minify": "npm-run-all --parallel css-minify-*",
+    "css-minify-main": "cleancss -O1 --format breakWith=lf --with-rebase --source-map --source-map-inline-sources --output wwwroot/css/ --batch --batch-suffix \".min\" \"wwwroot/css/*.css\" \"!wwwroot/css/*.min.css\" \"!wwwroot/css/*rtl*.css\"",
+    "css-prefix": "npm-run-all --parallel css-prefix-*",
+    "css-prefix-main": "postcss --config postcss.config.js --replace \"wwwroot/css/*.css\" \"!wwwroot/css/*.rtl*.css\" \"!wwwroot/css/*.min.css\"",
+    "css-fonts": "shx cp -r node_modules/@mdi/font/fonts wwwroot/fonts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wjervis7/09ME-Discord-Bot.git"
+  },
+  "author": "Warren Jervis",
+  "bugs": {
+    "url": "https://github.com/wjervis7/09ME-Discord-Bot/issues"
+  },
+  "homepage": "https://github.com/wjervis7/09ME-Discord-Bot#readme",
+  "devDependencies": {
+    "@mdi/font": "6.5.95",
+    "autoprefixer": "^10.2.6",
+    "bootstrap": "5.1.3",
+    "clean-css-cli": "^5.3.0",
+    "cross-env": "^7.0.3",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.3.0",
+    "postcss-cli": "^8.3.1",
+    "sass": "^1.34.1",
+    "shx": "^0.3.4",
+    "vuetify": "2.6.3"
+  }
 }

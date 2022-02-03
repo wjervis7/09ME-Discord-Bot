@@ -11,9 +11,3 @@ public class AuthMessageSenderOptions
     public Sender Sender { get; set; }
     public SecureSocketOptions Security { get; set; }
 }
-
-public class Sender
-{
-    public string Name { get; set; }
-    public string Email { get; set; }
-}

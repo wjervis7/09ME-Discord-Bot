@@ -6,12 +6,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Data;
-using Data.Entities;
 using Discord;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging;
+using ViewModels;
 using ActivityReport = ViewModels.ActivityReport;
 
 [Authorize(Roles = "DiscordAdmin")]
@@ -19,7 +19,8 @@ public class DiscordController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly DiscordService _discord;
-    private static readonly Regex _regex = new("(?<=\\<\\#)(.*?)(?=\\>)");
+    private static readonly Regex _channelRegex = new("(?<=\\<\\#)(.*?)(?=\\>)");
+    private static readonly Regex _userRegex = new("(?<=\\\"user\\\"\\:\\\")(\\d*)(?=\\\")");
 
     public DiscordController(ApplicationDbContext context, DiscordService discord)
     {
@@ -30,9 +31,29 @@ public class DiscordController : Controller
     [HttpGet]
     public async Task<IActionResult> Messages()
     {
-        IEnumerable<Message> messages = await _context.Messages.ToListAsync();
+        var messages = await _context.Messages.Select(m => new AdminMessage {
+            Id = m.Id,
+            Sender = m.Sender,
+            Body = m.Body,
+            DateSent = ((DateTimeOffset)m.DateSent).ToUnixTimeSeconds(),
+            IsAnonymous = m.IsAnonymous
+        }).ToListAsync();
 
-        return View(messages);
+        var userNames = new HashSet<string>();
+        userNames.AddRange(messages.Select(m => m.Sender));
+        var users = (await _discord.GetUsersByUsernames(userNames)).ToList();
+
+        var model = messages.Select(m =>
+        {
+            var senderParts = m.Sender.Split("#");
+            var username = senderParts[0];
+            var discriminator = senderParts[1];
+            var user = users.FirstOrDefault(u => u.User.Username == username && u.User.Discriminator == discriminator);
+            m.Sender = user?.Nickname ?? m.Sender;
+            return m;
+        });
+
+        return View(model);
     }
 
     [HttpGet]
@@ -41,8 +62,8 @@ public class DiscordController : Controller
         var reports = await _context.ActivityReports.Select(ar => new ActivityReport {
             Id = ar.Id,
             InitiatorId = ar.Initiator,
-            StartTime = ar.StartTime,
-            EndTime = ar.EndTime,
+            StartTime = ((DateTimeOffset)ar.StartTime).ToUnixTimeSeconds(),
+            EndTime = ((DateTimeOffset)ar.EndTime).ToUnixTimeSeconds(),
             ReportType = ar.ReportType,
             Args = ar.Args,
             Report = ar.Report
@@ -50,11 +71,18 @@ public class DiscordController : Controller
 
         var userIds = new HashSet<ulong>();
         userIds.AddRange(reports.Select(r => r.InitiatorId));
-        var users = await _discord.GetUsers(userIds);
-        
+        userIds.AddRange(reports.SelectMany(r => GetUserIdsFromArgs(r.Args)));
+        var users = (await _discord.GetUsersByIds(userIds)).ToList();
+
+        var channelIds = new HashSet<ulong>();
+        channelIds.AddRange(reports.SelectMany(r => GetChannelIdsFromReport(r.Report)));
+        var channels = (await _discord.GetChannels(channelIds)).ToList();
+
         var model = reports.Select(r =>
         {
             r.Initiator = users.Single(u => u.User.Id == r.InitiatorId).Nickname;
+            r.Args = ReplaceUserIdsWithNames(r.Args, users);
+            r.Report = ReplaceChannelIdsWithNames(r.Report, channels);
             return r;
         });
 
@@ -62,22 +90,46 @@ public class DiscordController : Controller
         return View(model);
     }
 
-    private string ReplaceChannelIdsWithNames(string report, List<DiscordChannel> channels)
+    private static IEnumerable<ulong> GetUserIdsFromArgs(string args)
     {
-
-        var newReport = "";
-        foreach (Match match in _regex.Matches(report))
-        {
-            var channelId = ulong.Parse(match.Value);
-            var channel = channels.Single(c => c.Id == channelId);
-            newReport = report.Replace($"<#{match.Value}>", channel.Name);
-        }
-        return newReport;
+        var matches = _userRegex.Matches(args);
+        return matches.Select(m => ulong.Parse(m.Value));
     }
 
-    private IEnumerable<ulong> GetChannelIdsFromReport(string report)
+    private static IEnumerable<ulong> GetChannelIdsFromReport(string report)
     {
-        var matches = _regex.Matches(report);
+        var matches = _channelRegex.Matches(report);
         return matches.Select(m => ulong.Parse(m.Value));
+    }
+
+    private static string ReplaceUserIdsWithNames(string args, IReadOnlyCollection<DiscordGuildMember> users)
+    {
+        var newArgs = args;
+
+        foreach (Match match in _userRegex.Matches(args))
+        {
+            var userId = ulong.Parse(match.Value);
+            var user = users.Single(u => u.User.Id == userId);
+            newArgs = newArgs.Replace($"\"user\":\"{match.Value}\"", $"\"user\":\"{user.Nickname}\"");
+        }
+
+        return newArgs;
+    }
+
+    private static string ReplaceChannelIdsWithNames(string report, IReadOnlyCollection<DiscordChannel> channels)
+    {
+
+        var newReport = report;
+        foreach (Match match in _channelRegex.Matches(report))
+        {
+            var channelId = ulong.Parse(match.Value);
+            var channel = channels.SingleOrDefault(c => c.Id == channelId);
+            if (channel == null)
+            {
+                continue;
+            }
+            newReport = newReport.Replace($"<#{match.Value}>", channel.Name);
+        }
+        return newReport;
     }
 }

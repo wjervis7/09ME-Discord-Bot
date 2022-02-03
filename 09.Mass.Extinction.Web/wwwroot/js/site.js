@@ -1,60 +1,52 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
-(($, moment) => {
-    $("[data-datetime]").each((_, el) => {
-        const dateTime = $(el).data("datetime");
-        const m = moment.utc(dateTime);
-        $(el).text(m.local().format("llll"));
-    });
-})(jQuery, moment);
-
-const initializeDataTable = (headers, data) => new Vue({
-    data() {
-        return {
-            expanded: [],
-            singleExpand: false,
-            headers,
-            data
-        };
-    },
-    vuetify: new Vuetify()
-});
-
-// activity reports
-(() => {
-    const initializeActivityReports = (data) => {
-        data = data.map(d => {
-            const args = JSON.parse(d.args);
-            d.args = args;
-            return d;
-        });
-
-        const app = initializeDataTable([
-                {
-                    text: "Report Type",
-                    align: "start",
-                    value: "reportType"
-                },
-                { text: "Initiator", value: "initiator" },
-                { text: "Start Time", value: "startTime" },
-                { text: "End Time", value: "End Time" }
-            ],
-            data.map(d => {
-                const args = d.args;
-                d.args = Object.entries(args).map(entry => {
-                    return {
-                        key: entry[0],
-                        value:
-                            entry[1]
-                    };
-                });
-                return d;
-            }));
-
-        app.$mount("#app");
+﻿const initializeDataTable = (headers, data, methods = {}, expand, search, sort) => {
+    var vueData = {
+        headers,
+        data
     };
 
-    window.initializeActivityReports = initializeActivityReports;
-})();
+    if (expand) {
+        vueData.expanded = [];
+        vueData.singleExpand = expand.singleExpand;
+    }
+
+    if (search) {
+        vueData.search = "";
+    }
+
+    if (sort) {
+        vueData.sortBy = sort.sortBy;
+        vueData.sortDesc = sort.sortDesc;
+        vueData.lastSortBy = sort.sortBy;
+        vueData.lastSortDesc = sort.sortDesc;
+    }
+
+    return new Vue({
+        data() {
+            return vueData;
+        },
+        methods,
+        vuetify: new window.Vuetify()
+    });
+};
+
+const _timeRegex = /(?<=\<t\:)(\d*)(?=\:f\>)/g;
+
+const replaceEpochWithLocalFormat = report => {
+    let newReport = report;
+    const matches = report.match(_timeRegex);
+    if (!matches) {
+        return newReport;
+    }
+    for (const match of matches) {
+        newReport = newReport.replace(`<t:${match}:f>`, formatDate(+match));
+    }
+    return newReport;
+};
+
+const formatDate = dateTime => moment.unix(dateTime).local().format("llll");
+
+export {
+    initializeDataTable,
+    replaceEpochWithLocalFormat,
+    formatDate
+};
