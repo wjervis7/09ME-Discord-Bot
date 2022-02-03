@@ -1,15 +1,12 @@
 namespace _09.Mass.Extinction.Web;
 
 using System;
-using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
-using System.Threading.Tasks;
+using System.Net.Http.Headers;
 using Data;
 using Data.Entities;
 using Discord;
 using Email;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -64,23 +61,8 @@ public class Startup
                 options.ClientId = discordAuthSection["ClientId"];
                 options.ClientSecret = discordAuthSection["ClientSecret"];
                 options.Scope.Add("email");
-                options.Scope.Add("guilds");
-                options.Scope.Add("guilds.members.read");
 
                 options.SaveTokens = true;
-
-                options.Events.OnCreatingTicket = ctx =>
-                {
-                    ctx.Identity?.AddClaim(new Claim("access_token", ctx.AccessToken ?? ""));
-                    ctx.Properties.IsPersistent = true;
-                    return Task.CompletedTask;
-                };
-
-                options.Events.OnTicketReceived = context =>
-                {
-                    Console.WriteLine(context.Principal.Identity.Name);
-                    return Task.CompletedTask;
-                };
             });
 
         services.Configure<DiscordConfiguration>(Configuration.GetSection("Discord"));
@@ -88,7 +70,10 @@ public class Startup
         {
             var config = provider.GetRequiredService<IOptions<DiscordConfiguration>>().Value;
             var client = new HttpClient {
-                BaseAddress = new Uri(config.ApiEndpoint)
+                BaseAddress = new Uri(config.ApiEndpoint),
+                DefaultRequestHeaders = {
+                    Authorization = AuthenticationHeaderValue.Parse($"Bot {config.Token}")
+                }
             };
             return client;
         });

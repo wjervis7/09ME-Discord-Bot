@@ -4,11 +4,13 @@ using System.Text.Json.Serialization;
 
 public class DiscordGuildMember
 {
-    [JsonPropertyName("user")]
+    [JsonPropertyName("user")] 
     public DiscordUser User { get; set; }
 
-    [JsonPropertyName("nick")] private string _nickName;
+    [JsonPropertyName("nick")]
+    // ReSharper disable once UnassignedGetOnlyAutoProperty
+    private string Nick { get; }
 
-    [JsonIgnore]
-    public string Nickname => string.IsNullOrWhiteSpace(_nickName) ? User.Username : _nickName;
+    [JsonIgnore] 
+    public string Nickname => string.IsNullOrWhiteSpace(Nick) ? User.Username : Nick;
 }
