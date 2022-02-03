@@ -23,7 +23,6 @@ WORKDIR /src
 COPY ["09.Mass.Extinction.Web/package*.json", "09.Mass.Extinction.Web/postcss.config.js", "09.Mass.Extinction.Web/"]
 COPY ["09.Mass.Extinction.Web/src", "09.Mass.Extinction.Web/src"]
 WORKDIR "/src/09.Mass.Extinction.Web"
-RUN ls -la
 RUN npm install
 RUN npm run css
 
@@ -32,4 +31,5 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 COPY --from=node /src/09.Mass.Extinction.Web/wwwroot/css ./wwwroot/css
+COPY --from=node /src/09.Mass.Extinction.Web/wwwroot/fonts ./wwwroot/fonts
 ENTRYPOINT ["dotnet", "09.Mass.Extinction.Web.dll"]
