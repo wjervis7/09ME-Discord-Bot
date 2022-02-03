@@ -1,21 +1,36 @@
 ﻿@model IEnumerable<_09.Mass.Extinction.Web.ViewModels.ActivityReport>
 
-<div id="app">
+@{
+    ViewData["Title"] = "View Activity Reports";
+}
+
+<div id="app" data-app>
     <template>
         <v-data-table
             :headers="headers"
             :items="data"
             :single-expand="singleExpand"
             :expanded.sync="expanded"
+            :search="search"
+            :custom-sort="sortTable"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
             item-key="id"
             show-expand
-            @@click:row="(item, slot) => slot.expand(!slot.isExpanded)"
             dense
             dark
             class="elevation-1">
             <template v-slot:top>
                 <v-toolbar flat>
                     <v-toolbar-title>Activity Reports</v-toolbar-title>
+                    <v-spacer></v-spacer>
+                    <v-text-field
+                        v-model="search"
+                        append-icon="mdi-magnify"
+                        label="Search"
+                        single-line
+                        hide-details
+                    ></v-text-field>
                 </v-toolbar>
             </template>
             <template v-slot:expanded-item="{ headers, item }">
@@ -35,9 +50,11 @@
 
 @section Scripts
 {
-    <script type="text/javascript">
+    <script type="module">
+        import loadPage from "/js/Discord/activityReport.js";
+
         const model = @Html.Raw(Json.Serialize(Model));
-        console.info(model);
-        window.initializeActivityReports(model);
+        
+        loadPage(model);
     </script>
 }

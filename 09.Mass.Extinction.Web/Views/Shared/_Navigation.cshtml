@@ -9,43 +9,41 @@
 }
 
 
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
-        <div class="container">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Ninth Mass Extinction</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Ninth Mass Extinction</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" 
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse">
+            <ul class="navbar-nav flex-row flex-wrap bd-navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link @ClassName("Home", "Index")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @ClassName("Home", "Privacy")" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                </li>
+                @if (User.IsInRole("DiscordAdmin"))
+                {
                     <li class="nav-item">
-                        <a class="nav-link @ClassName("Home", "Index")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        <a class="nav-link @ClassName("Discord", "Messages")" asp-area="" asp-controller="Discord" asp-action="Messages">Admin Messages</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link @ClassName("Home", "Privacy")" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="nav-link @ClassName("Discord", "ActivityReports")" asp-area="" asp-controller="Discord" asp-action="ActivityReports">Activity Reports</a>
                     </li>
-                    @if (User.IsInRole("DiscordAdmin"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link @ClassName("Discord", "Messages")" asp-area="" asp-controller="Discord" asp-action="Messages">Admin Messages</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @ClassName("Discord", "ActivityReports")" asp-area="" asp-controller="Discord" asp-action="ActivityReports">Activity Reports</a>
-                        </li>
-                    }
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link @ClassName("RoleManager", "Index")" asp-area="" asp-controller="RoleManager" asp-action="Index">Manage Roles</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @ClassName("UserRoles", "Index")" asp-area="" asp-controller="UserRoles" asp-action="Index">Manage Users</a>
-                        </li>
-                    }
-                </ul>
-                <partial name="_LoginPartial"/>
-            </div>
+                }
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link @ClassName("RoleManager", "Index")" asp-area="" asp-controller="RoleManager" asp-action="Index">Manage Roles</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @ClassName("UserRoles", "Index")" asp-area="" asp-controller="UserRoles" asp-action="Index">Manage Users</a>
+                    </li>
+                }
+            </ul>
+            <partial name="_LoginPartial"/>
         </div>
-    </nav>
-</header>
+    </div>
+</nav>

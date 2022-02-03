@@ -90,11 +90,13 @@
             ProviderDisplayName = info.ProviderDisplayName;
             if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
             {
+                var userId = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
+                var avatarHash = info.Principal.FindFirstValue("urn:discord:avatar:hash");
                 Input = new InputModel
                 {
                     Email = info.Principal.FindFirstValue(ClaimTypes.Email),
                     Name = info.Principal.Identity?.Name,
-                    ProfilePicture = info.Principal.FindFirstValue("urn:discord:avatar:url")
+                    ProfilePicture = $"https://cdn.discordapp.com/avatars/{userId}/{avatarHash}.png"
                 };
             }
 

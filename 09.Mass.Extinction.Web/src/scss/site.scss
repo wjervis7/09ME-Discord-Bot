@@ -2,4 +2,8 @@
 @import "bootstrap/scss/bootstrap";
 @import "bootswatch";
 
-@import "vuetify/vuetify";
+@import "vuetify/dist/vuetify";
+
+.full-width {
+    white-space: nowrap; 
+}

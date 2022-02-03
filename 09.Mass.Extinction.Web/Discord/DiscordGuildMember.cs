@@ -7,8 +7,9 @@ public class DiscordGuildMember
     [JsonPropertyName("user")]
     public DiscordUser User { get; set; }
 
-    [JsonPropertyName("nick")] private string _nickName;
+    [JsonPropertyName("nick")] 
+    private string Nick { get; }
 
     [JsonIgnore]
-    public string Nickname => string.IsNullOrWhiteSpace(_nickName) ? User.Username : _nickName;
+    public string Nickname => string.IsNullOrWhiteSpace(Nick) ? User.Username : Nick;
 }

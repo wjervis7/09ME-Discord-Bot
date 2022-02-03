@@ -24,3 +24,4 @@ LICENSE
 README.md
 **/node_modules
 npm-debug.log
+**/wwwroot/css
