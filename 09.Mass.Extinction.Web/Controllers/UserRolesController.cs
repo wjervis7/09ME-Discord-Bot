@@ -28,10 +28,11 @@ public class UserRolesController : Controller
         var userRolesViewModel = new List<UserRolesViewModel>();
         foreach (var user in users)
         {
-            var thisViewModel = new UserRolesViewModel();
-            thisViewModel.UserId = user.Id;
-            thisViewModel.Email = user.Email;
-            thisViewModel.Roles = await GetUserRoles(user);
+            var thisViewModel = new UserRolesViewModel {
+                UserId = user.Id,
+                Email = user.Email,
+                Roles = await GetUserRoles(user)
+            };
             userRolesViewModel.Add(thisViewModel);
         }
 
@@ -45,6 +46,7 @@ public class UserRolesController : Controller
         if (user == null)
         {
             ViewBag.ErrorMessage = $"User with Id = {userId} cannot be found";
+            // ReSharper disable once Mvc.ViewNotResolved
             return View("NotFound");
         }
 
@@ -92,8 +94,7 @@ public class UserRolesController : Controller
 
         ModelState.AddModelError("", "Cannot add selected roles to user");
         return View(model);
-
     }
 
-    private async Task<List<string>> GetUserRoles(ApplicationUser user) => new List<string>(await _userManager.GetRolesAsync(user));
+    private async Task<List<string>> GetUserRoles(ApplicationUser user) => new(await _userManager.GetRolesAsync(user));
 }

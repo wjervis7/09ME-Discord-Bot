@@ -1,16 +1,12 @@
 namespace _09.Mass.Extinction.Web;
 
 using System;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Data;
 using Data.Entities;
 using Discord;
 using Email;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
