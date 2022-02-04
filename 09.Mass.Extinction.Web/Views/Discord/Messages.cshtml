@@ -34,11 +34,12 @@
                 </v-toolbar>
             </template>
             <template v-slot:item.data-table-expand="{item, isExpanded, expand }">
-                <button v-if="item.canExpand" type="button" class="v-icon notranslate v-data-table__expand-icon v-icon--link mdi mdi-chevron-down theme--dark"></button>
+                <button @@click="expand(!isExpanded)" v-if="item.canExpand && !isExpanded" type="button" class="v-icon notranslate v-data-table__expand-icon v-icon--link mdi mdi-chevron-down theme--dark"></button>
+                <button @@click="expand(!isExpanded)" v-if="item.canExpand && isExpanded" type="button" class="v-icon notranslate v-data-table__expand-icon v-icon--link mdi mdi-chevron-up theme--dark"></button>
             </template>
             <template v-slot:expanded-item="{ headers, item }">
                 <td :colspan="headers.length">
-                    <p style="white-space: pre;">{{ item.body }}</p>
+                    <p style="white-space: pre-wrap;">{{ item.body }}</p>
                 </td>
             </template>
         </v-data-table>
