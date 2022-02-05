@@ -51,8 +51,9 @@ jobs:
         with:
           images: ${{ secrets.DOCKER_USERNAME }}/09me-website
           flavor: |
-            latest=${{ steps.vars.outputs.branch == 'master' }}
+            latest=false
           tags: |
+            type=raw,value=latest,enable=${{ steps.vars.outputs.branch == 'master' }}
             type=raw,value=beta,enable=${{ steps.vars.outputs.branch == 'dev' }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
