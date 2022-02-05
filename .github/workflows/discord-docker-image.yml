@@ -28,6 +28,9 @@ jobs:
       - name: Set output
         id: vars
         run: echo ::set-output name=branch::${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
+        
+      - name: Check output
+        run: echo ${{ steps.vars.outputs.branch }}
       
       - name: Extract metadata (tags, labels) for Docker - bot
         id: meta-bot
