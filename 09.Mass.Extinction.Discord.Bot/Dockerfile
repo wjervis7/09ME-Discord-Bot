@@ -1,20 +1,11 @@
-FROM node
+FROM node:17.4.0
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm ci --only=production
+RUN npm i -g npm@8.3.2 && npm ci --only=production
 
 COPY . .
-
-ENV TOKEN=
-ENV GUILD=
-ENV CHANNEL=
-ENV DB_NAME=
-ENV DB_USER=
-ENV DB_PASS=
-ENV DB_HOST=
-ENV DB_PORT=
 
 CMD [ "node", "app.js" ]

@@ -1,14 +1,14 @@
-import { Sequelize } from "sequelize";
-import Message from "./entities/Message.js";
-import dotenv from "dotenv";
+const { Sequelize } = require("sequelize");
+const Message = require("./entities/Message.js");
+const DiscordUser = require("./entities/DiscordUser.js");
+const ActivityReport = require("./entities/ActivityReport.js");
+const Logger = require("../utilities/logging.js");
+const { DB_NAME: dbName, DB_USER: user, DB_PASS: password, DB_HOST: host, DB_PORT: port } = require("../config.json");
 
-dotenv.config();
-
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
+const sequelize = new Sequelize(dbName, user, password, {
+    host,
+    port,
     dialect: "mssql",
-    operatorsAliases: false,
     pool: {
         max: 5,
         min: 0,
@@ -28,16 +28,28 @@ Message.init(
     }
 );
 
+DiscordUser.init(
+    DiscordUser.sequelizeInit(),
+    {
+        sequelize,
+        tableName: "DiscordUsers"
+    }
+);
 
-
-
+ActivityReport.init(
+    ActivityReport.sequelizeInit(),
+    {
+        sequelize,
+        tableName: "ActivityReports"
+    }
+);
 
 (async () => {
     try {
         await sequelize.authenticate();
-        console.log("Connection established.");
+        Logger.logInformation("Connection established.");
     } catch (error) {
-        console.error("Unable to connect to the database:", error);
+        Logger.logError("Unable to connect to the database:", error);
     }
 })();
 
@@ -51,6 +63,35 @@ class Context {
         });
         return newMessage;
     }
+
+    async updateDiscordUserTimeZone(userId, timeZone) {
+        return await DiscordUser.upsert({
+            id: userId,
+            timeZone
+        });
+    }
+
+    async getDiscordUserTimeZone(userId) {
+        const discordUser = await DiscordUser.findByPk(userId);
+        return discordUser.timeZone;
+    }
+
+    async getTimeZones() {
+        const discordUsers = await DiscordUser.findAll({ attributes: ["timeZone"] });
+        return [... new Set(discordUsers.map(discordUser => discordUser.timeZone))];
+    }
+
+    async addActivityReport(initiator, startTime, endTime, type, args, report) {
+        const r = await ActivityReport.create({
+            initiator,
+            startTime: startTime,
+            endTime: endTime,
+            reportType: type,
+            args,
+            report
+        });
+        return r;
+    }
 }
 
-export default Context;
+module.exports = Context;

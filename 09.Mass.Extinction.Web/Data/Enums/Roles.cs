@@ -1,8 +1,7 @@
-﻿namespace _09.Mass.Extinction.Web.Data.Enums
+﻿namespace _09.Mass.Extinction.Web.Data.Enums;
+
+public enum Roles
 {
-    public enum Roles
-    {
-        DiscordAdmin,
-        Admin
-    }
+    DiscordAdmin,
+    Admin
 }

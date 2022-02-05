@@ -1,21 +1,16 @@
-﻿using System;
-using _09.Mass.Extinction.Web.Data;
+﻿using _09.Mass.Extinction.Web.Areas.Identity;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
-[assembly: HostingStartup(typeof(_09.Mass.Extinction.Web.Areas.Identity.IdentityHostingStartup))]
-namespace _09.Mass.Extinction.Web.Areas.Identity
+[assembly: HostingStartup(typeof(IdentityHostingStartup))]
+
+namespace _09.Mass.Extinction.Web.Areas.Identity;
+
+using Microsoft.AspNetCore.Hosting;
+
+public class IdentityHostingStartup : IHostingStartup
 {
-    public class IdentityHostingStartup : IHostingStartup
-    {
-        public void Configure(IWebHostBuilder builder)
+    public void Configure(IWebHostBuilder builder) =>
+        builder.ConfigureServices((_, _) =>
         {
-            builder.ConfigureServices((context, services) => {
-            });
-        }
-    }
+        });
 }

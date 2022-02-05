@@ -1,14 +1,13 @@
-﻿namespace _09.Mass.Extinction.Web.Data.Entities
+﻿namespace _09.Mass.Extinction.Web.Data.Entities;
+
+using Microsoft.AspNetCore.Identity;
+
+// Add profile data for application users by adding properties to the ApplicationUser class
+public class ApplicationUser : IdentityUser
 {
-    using Microsoft.AspNetCore.Identity;
+    [PersonalData]
+    public string Name { get; set; }
 
-    // Add profile data for application users by adding properties to the ApplicationUser class
-    public class ApplicationUser : IdentityUser
-    {
-        [PersonalData]
-        public string Name { get; set; }
-
-        [PersonalData]
-        public string ProfilePicture { get; set; }
-    }
+    [PersonalData]
+    public string ProfilePicture { get; set; }
 }

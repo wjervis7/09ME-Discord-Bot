@@ -28,24 +28,43 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".eslintrc.json" />
     <Content Include=".env" />
     <Content Include="app.js" />
-    <Content Include="data\context.js">
+    <Content Include="commands\nickname.js">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="data\entities\Message.js">
-      <SubType>Code</SubType>
-    </Content>
+    <Content Include="commands\time-zone.js" />
+    <Content Include="commands\time.js" />
+    <Content Include="commands\activity.js" />
+    <Content Include="config.json" />
+    <Content Include="data\context.js" />
+    <Content Include="data\entities\ActivityReport.js" />
+    <Content Include="data\entities\Message.js" />
+    <Content Include="data\entities\DiscordUser.js" />
+    <Content Include="deploy-commands.js" />
     <Content Include="Dockerfile" />
     <Content Include="events\private-message.js" />
     <Content Include="package-lock.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
+    <Content Include="timezones.json" />
+    <Content Include="utilities\asyncHelpers.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="utilities\helpers.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="utilities\logging.js">
+      <SubType>Code</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="data\entities\" />
     <Folder Include="events\" />
     <Folder Include="data\" />
+    <Folder Include="commands\" />
+    <Folder Include="utilities\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
 </Project>

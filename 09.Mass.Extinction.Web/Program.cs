@@ -1,54 +1,55 @@
-namespace _09.Mass.Extinction.Web
+namespace _09.Mass.Extinction.Web;
+
+using System;
+using System.Threading.Tasks;
+using Data;
+using Data.Entities;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+public class Program
 {
-    using System;
-    using System.Threading.Tasks;
-    using Data;
-    using Data.Entities;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Identity;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Logging;
-
-    public class Program
+    public static async Task Main(string[] args)
     {
-        public static async Task Main(string[] args)
-        {
-            var host = CreateHostBuilder(args).Build();
+        var host = CreateHostBuilder(args).Build();
 
-            using (var scope = host.Services.CreateScope())
+        using (var scope = host.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+            try
             {
-                var services = scope.ServiceProvider;
-                var loggerFactory = services.GetRequiredService<ILoggerFactory>();
-                try
-                {
-                    var context = services.GetRequiredService<ApplicationDbContext>();
-                    await context.Database.MigrateAsync();
+                var context = services.GetRequiredService<ApplicationDbContext>();
+                await context.Database.MigrateAsync();
 
-                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-                    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-                    var configuration = services.GetRequiredService<IConfiguration>();
-                    await ContextSeed.SeedRolesAsync(roleManager);
-                    await ContextSeed.SeedAdminUserAsync(userManager, configuration);
+                var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                var configuration = services.GetRequiredService<IConfiguration>();
+                await ContextSeed.SeedRolesAsync(roleManager);
+                await ContextSeed.SeedAdminUserAsync(userManager, configuration);
 
-                    await context.SaveChangesAsync();
-                }
-                catch (Exception e)
-                {
-                    var logger = loggerFactory.CreateLogger<Program>();
-                    logger.LogError(e, "An error occurred while seeding the DB.");
-                }
+                await context.SaveChangesAsync();
             }
-
-            host.Run();
+            catch (Exception e)
+            {
+                var logger = loggerFactory.CreateLogger<Program>();
+                logger.LogError(e, "An error occurred while seeding the DB.");
+            }
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
-        }
+        await host.RunAsync();
     }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration(builder =>
+            {
+                builder.AddJsonFile("appsettings.docker.json", true, true);
+            })
+            .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
 }
