@@ -1,9 +1,10 @@
-name: publish beta images
+name: publish docker images images
 
 on:
   push:
     branches:
       - 'dev'
+      - 'master'
     tags:
       - 'v*'
 
@@ -23,15 +24,20 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+          
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=branch::${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
       
       - name: Extract metadata (tags, labels) for Docker - bot
         id: meta-bot
         uses: docker/metadata-action@v3.6.2
         with:
-          images: wjervis7/09me-discord
+          images: ${{ secrets.DOCKER_USERNAME }}/09me-discord
+          flavor: |
+            latest=${{ steps.vars.outputs.branch == 'master' }}
           tags: |
-            type=ref,event=tag
-            type=raw,value=beta,enable=true
+            type=raw,value=beta,enable=${{ steps.vars.outputs.branch == 'dev' }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             
@@ -39,19 +45,14 @@ jobs:
         id: meta-web
         uses: docker/metadata-action@v3.6.2
         with:
-          images: wjervis7/09me-website
+          images: ${{ secrets.DOCKER_USERNAME }}/09me-website
+          flavor: |
+            latest=${{ steps.vars.outputs.branch == 'master' }}
           tags: |
-            type=ref,event=tag
-            type=raw,value=beta,enable=true
+            type=raw,value=beta,enable=${{ steps.vars.outputs.branch == 'dev' }}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             
-      - name: Set output
-        id: vars
-        run: echo ::set-output name=branch::${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
-      - name: Check output
-        run: echo ${{ steps.vars.outputs.branch }}
-      
       - name: Build and push Docker image - bot
         uses: docker/build-push-action@v2.8.0
         with:
