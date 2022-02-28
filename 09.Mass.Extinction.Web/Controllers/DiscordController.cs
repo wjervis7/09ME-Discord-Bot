@@ -5,14 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Data;
 using Discord;
+using Discord.Responses;
+using Extinction.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Packaging;
-using ViewModels;
-using ActivityReport = ViewModels.ActivityReport;
+using ViewModels.Discord;
+using ActivityReport = ViewModels.Discord.ActivityReport;
 
 [Authorize(Roles = "DiscordAdmin")]
 public class DiscordController : Controller
@@ -39,9 +39,7 @@ public class DiscordController : Controller
             IsAnonymous = m.IsAnonymous
         }).ToListAsync();
 
-        var userNames = new HashSet<string>();
-        userNames.AddRange(messages.Select(m => m.Sender));
-        var users = (await _discord.GetUsersByUsernames(userNames)).ToList();
+        var users = (await _discord.GetUsersByUsernames(messages.Select(m => m.Sender).ToList())).ToList();
 
         var model = messages.Select(m =>
         {
@@ -69,14 +67,12 @@ public class DiscordController : Controller
             Report = ar.Report
         }).ToListAsync();
 
-        var userIds = new HashSet<ulong>();
+        var userIds = new List<ulong>();
         userIds.AddRange(reports.Select(r => r.InitiatorId));
         userIds.AddRange(reports.SelectMany(r => GetUserIdsFromArgs(r.Args)));
         var users = (await _discord.GetUsersByIds(userIds)).ToList();
 
-        var channelIds = new HashSet<ulong>();
-        channelIds.AddRange(reports.SelectMany(r => GetChannelIdsFromReport(r.Report)));
-        var channels = (await _discord.GetChannels(channelIds)).ToList();
+        var channels = (await _discord.GetChannels(reports.SelectMany(r => GetChannelIdsFromReport(r.Report)).ToList())).ToList();
 
         var model = reports.Select(r =>
         {

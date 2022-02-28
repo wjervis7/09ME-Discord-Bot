@@ -2,8 +2,8 @@ namespace _09.Mass.Extinction.Web;
 
 using System;
 using System.Threading.Tasks;
-using Data;
-using Data.Entities;
+using Extinction.Data;
+using Extinction.Data.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
