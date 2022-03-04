@@ -4,7 +4,7 @@ namespace _09.Mass.Extinction.Web.Areas.Identity.Pages.Account.Manage;
 
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Data.Entities;
+using Extinction.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

@@ -1,0 +1,5 @@
+# Generated files, so ignore all rules
+root = true
+
+[.cs]
+csharp_using_directive_placement=outside_namespace:error
