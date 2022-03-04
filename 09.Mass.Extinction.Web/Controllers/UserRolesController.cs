@@ -3,12 +3,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Data.Entities;
+using Extinction.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Models;
+using ViewModels.RoleManager;
+using ViewModels.UserRoles;
 
 [Authorize(Roles = "Admin")]
 public class UserRolesController : Controller
