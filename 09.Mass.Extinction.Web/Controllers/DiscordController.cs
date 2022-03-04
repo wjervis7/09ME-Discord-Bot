@@ -76,7 +76,7 @@ public class DiscordController : Controller
 
         var model = reports.Select(r =>
         {
-            r.Initiator = users.Single(u => u.User.Id == r.InitiatorId).Nickname;
+            r.Initiator = users.SingleOrDefault(u => u.User.Id == r.InitiatorId)?.Nickname ?? r.InitiatorId.ToString();
             r.Args = ReplaceUserIdsWithNames(r.Args, users);
             r.Report = ReplaceChannelIdsWithNames(r.Report, channels);
             return r;
@@ -105,8 +105,8 @@ public class DiscordController : Controller
         foreach (Match match in _userRegex.Matches(args))
         {
             var userId = ulong.Parse(match.Value);
-            var user = users.Single(u => u.User.Id == userId);
-            newArgs = newArgs.Replace($"\"user\":\"{match.Value}\"", $"\"user\":\"{user.Nickname}\"");
+            var user = users.SingleOrDefault(u => u.User.Id == userId);
+            newArgs = newArgs.Replace($"\"user\":\"{match.Value}\"", $"\"user\":\"{user?.Nickname ?? userId.ToString()}\"");
         }
 
         return newArgs;
