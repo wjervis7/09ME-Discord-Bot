@@ -24,7 +24,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(e => e.Sender).IsRequired();
             entity.Property(e => e.Body).IsRequired();
             entity.Property(e => e.DateSent).IsRequired();
-            entity.Property(e => e.IsAnonymous).IsRequired();
+            entity.Property(e => e.IsAnonymous).IsRequired().HasDefaultValue(false);
         });
 
         builder.Entity<DiscordUser>(entity =>

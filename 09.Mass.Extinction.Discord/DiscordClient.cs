@@ -90,7 +90,7 @@ public class DiscordClient
 
                 if (ISlashCommand.IsInvalidUsage(commandConfiguration, command, out var message))
                 {
-                    _logger.LogWarning(message);
+                    _logger.LogWarning("The command could not be executed: {errorMessage}", message);
                     return command.RespondAsync("You are not authorized to use this command.", ephemeral: true);
                 }
 
@@ -114,12 +114,14 @@ public class DiscordClient
         command.WithName(slashCommand.Name);
         command.WithDescription(slashCommand.Description);
         command.AddOptions(slashCommand.Options);
-
+        command.WithDefaultPermission(true);
+        command.IsDefaultPermission = true;
         return command;
     }
 
     private Task DiscordLogger(LogMessage arg)
     {
+        // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
         switch (arg.Severity)
         {
             case LogSeverity.Critical:
@@ -140,8 +142,6 @@ public class DiscordClient
             case LogSeverity.Debug:
                 _logger.LogDebug(arg.Exception, "Discord: {message}.", arg.Message);
                 break;
-            default:
-                throw new ArgumentOutOfRangeException();
         }
 
         return Task.CompletedTask;

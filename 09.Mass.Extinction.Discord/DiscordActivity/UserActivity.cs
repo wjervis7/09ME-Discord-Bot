@@ -2,6 +2,7 @@
 
 public class UserActivity
 {
-    public string User { get; set; }
+    public ulong UserId { get; set; }
+    public string Nickname { get; set; }
     public List<UserChannelActivity> Activity { get; set; }
 }
