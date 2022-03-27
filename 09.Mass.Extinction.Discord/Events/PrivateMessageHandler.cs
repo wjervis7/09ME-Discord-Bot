@@ -19,14 +19,10 @@ Your message lacks content, so I can't send anything to the Admin Team. Perhaps,
 If so, edit your message, and try sending it, again.
 ";
 
-    private const string _anonymousReplyMessageText = "Do you want to send this anonymously? React with 🇾 for yes, or 🇳 for no.";
     private const string _messageSentText = "Message was sent to the admin team.";
-    private const string _yesEmoji = "🇾";
-    private const string _noEmoji = "🇳";
 
     private readonly DiscordSocketClient _client;
     private readonly ILogger<PrivateMessageHandler> _logger;
-    private readonly Dictionary<ulong, SocketUserMessage> _pendingMessages = new();
     private readonly IServiceProvider _serviceProvider;
 
     public PrivateMessageHandler(ILogger<PrivateMessageHandler> logger, DiscordSocketClient client, IServiceProvider serviceProvider)
@@ -34,8 +30,6 @@ If so, edit your message, and try sending it, again.
         _logger = logger;
         _client = client;
         _serviceProvider = serviceProvider;
-
-        _client.ReactionAdded += OnReactionAdded;
     }
 
     public string Name => "Direct Message Handler";
@@ -56,33 +50,7 @@ If so, edit your message, and try sending it, again.
             return;
         }
 
-        _logger.LogDebug("Sending anonymous message prompt.");
-        var reply = await message.ReplyAsync(_anonymousReplyMessageText);
-        await reply.AddReactionAsync(new Emoji(_yesEmoji));
-        await reply.AddReactionAsync(new Emoji(_noEmoji));
-
-        _pendingMessages.Add(reply.Id, message);
-    }
-
-    private async Task OnReactionAdded(Cacheable<IUserMessage, ulong> reactionMessage, Cacheable<IMessageChannel, ulong> _, SocketReaction reaction)
-    {
-        if (!_pendingMessages.ContainsKey(reactionMessage.Id))
-        {
-            _logger.LogDebug("Reaction is not for a message sent by bot.");
-            return;
-        }
-
-        var message = _pendingMessages[reactionMessage.Id];
-
-        if (reaction.Emote.Name != _yesEmoji && reaction.Emote.Name != _noEmoji || reaction.UserId != message.Author.Id)
-        {
-            _logger.LogDebug("Reaction not valid, or not sent by the expected person.");
-            return;
-        }
-
-        var isAnonymous = reaction.Emote.Name == "🇾";
-        _logger.LogInformation($"Message is {(isAnonymous ? "being" : "not being")} sent anonymously.");
-        var sender = $"{reaction.User.Value.Username}#{reaction.User.Value.Discriminator}";
+        var sender = $"{message.Author.Username}#{message.Author.Discriminator}";
         try
         {
             using var scope = _serviceProvider.CreateScope();
@@ -93,27 +61,21 @@ If so, edit your message, and try sending it, again.
             await context.Messages.AddAsync(new Message {
                 Sender = sender,
                 Body = message.Content,
-                DateSent = DateTime.UtcNow,
-                IsAnonymous = isAnonymous
+                DateSent = DateTime.UtcNow
             });
             await context.SaveChangesAsync();
             _logger.LogDebug("Message saved to database.");
 
             _logger.LogDebug("Sending message to admin channel.");
-
             var guild = _client.GetGuild(config.GuildId);
             var adminChannel = guild.GetTextChannel(config.AdminChannelId);
-            var author = guild.GetUser(reaction.UserId);
-            var adminMessage = isAnonymous
-                ? $"Anonymous message received:\n>>> {message.Content}"
-                : $"Message received from {author.Nickname ?? $"{author.Username}#{author.Discriminator}"}:\n>>> {message.Content}";
+            var adminMessage = $"Message received from <@{message.Author.Id}>:\n>>> {message.Content}";
 
             await adminChannel.SendMessageAsync(adminMessage);
             _logger.LogDebug("Message sent to admin channel.");
 
             _logger.LogDebug("Notifying user that message was sent.");
-            await (await reactionMessage.GetOrDownloadAsync()).ReplyAsync(_messageSentText);
-            _pendingMessages.Remove(reactionMessage.Id);
+            await message.ReplyAsync(_messageSentText);
             _logger.LogDebug("Handler complete.");
         }
         catch (HttpException exception)

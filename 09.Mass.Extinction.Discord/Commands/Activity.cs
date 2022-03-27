@@ -1,6 +1,7 @@
 ﻿namespace _09.Mass.Extinction.Discord.Commands;
 
 using DiscordActivity;
+using Exceptions;
 using global::Discord;
 using global::Discord.WebSocket;
 using Helpers;
@@ -76,7 +77,7 @@ public class Activity : ISlashCommand
         var response = subCommand.Name switch {
             "user" => await activityHelper.GetUserActivity(subCommand.Options.GetValue<SocketGuildUser>("user"), subCommand.Options.GetValue<long>("days")),
             "all" => await activityHelper.GetInactiveUsers(subCommand.Options.GetValue<long>("posts"), subCommand.Options.GetValue<long>("days")),
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new InvalidSubCommandException()
         };
 
         if (timedOut)
@@ -90,7 +91,17 @@ public class Activity : ISlashCommand
             _logger.LogDebug("Stopping timer.");
             timer.Change(Timeout.Infinite, Timeout.Infinite);
             _logger.LogDebug("Using interaction to reply.");
-            await command.ModifyOriginalResponseAsync(properties => properties.Content = response);
+
+            if (response.Length > 2000)
+            {
+                _logger.LogDebug("Response is too large, gotta send in chunks.");
+                await command.ModifyOriginalResponseAsync(properties => properties.Content = $"<@{command.User.Id}>, the report has finished:");
+                await SendInChunks(response, command.Channel);
+            }
+            else
+            {
+                await command.ModifyOriginalResponseAsync(properties => properties.Content = response);
+            }
         }
 
         _logger.LogDebug("Command handler complete.");
@@ -99,7 +110,7 @@ public class Activity : ISlashCommand
     private static async Task SendInChunks(string message, ISocketMessageChannel channel)
     {
         var chunks = new List<string>();
-        const int chunkSize = 200;
+        const int chunkSize = 2000;
 
         while (message.Length >= chunkSize)
         {
@@ -108,6 +119,8 @@ public class Activity : ISlashCommand
             chunks.Add(chunk[..i]);
             message = message[i..];
         }
+
+        chunks.Add(message);
 
         foreach (var chunk in chunks)
         {

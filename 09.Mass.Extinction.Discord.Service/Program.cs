@@ -31,12 +31,12 @@ var host = Host.CreateDefaultBuilder(args)
                 GatewayIntents.DirectMessageReactions
         });
         services.AddSingleton(client);
+        services.AddSingleton<MessageCache>();
         services.AddSingleton<CommandService>();
         // services.AddSingleton<CommandHandlingService>();
         services.AddSingleton(new InteractiveService(client));
 
         // Discord handlers/commands
-        services.Configure<CommandConfiguration>(hostingContext.Configuration.GetSection("Discord:CommandConfiguration"));
         services.AddSingleton<IMessageHandler, PrivateMessageHandler>();
         services.AddSingleton<ISlashCommand, Nickname>();
         services.AddSingleton<ISlashCommand, Activity>();
