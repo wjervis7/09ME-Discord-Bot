@@ -1,5 +1,9 @@
 ﻿namespace _09.Mass.Extinction.Discord.Commands;
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Data;
+using Data.Entities;
 using DiscordActivity;
 using Exceptions;
 using global::Discord;
@@ -70,15 +74,45 @@ public class Activity : ISlashCommand
         await command.DeferAsync();
         await using var scope = _serviceProvider.CreateAsyncScope();
         var activityHelper = scope.ServiceProvider.GetRequiredService<ActivityHelper>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var start = DateTimeOffset.UtcNow.DateTime;
         var timedOut = false;
         var timer = new Timer(_ => timedOut = true, null, _time, Timeout.Infinite);
 
         var subCommand = command.Data.Options.First();
-        var response = subCommand.Name switch {
-            "user" => await activityHelper.GetUserActivity(subCommand.Options.GetValue<SocketGuildUser>("user"), subCommand.Options.GetValue<long>("days")),
-            "all" => await activityHelper.GetInactiveUsers(subCommand.Options.GetValue<long>("posts"), subCommand.Options.GetValue<long>("days")),
-            _ => throw new InvalidSubCommandException()
+        string? response;
+        var days = subCommand.Options.GetValue<long>("days");
+        var args = new Args {
+            Days = days
         };
+        switch (subCommand.Name)
+        {
+            case "user":
+                var user = subCommand.Options.GetValue<SocketGuildUser>("user");
+                args.User = user.Id;
+                response = await activityHelper.GetUserActivity(user, days);
+                break;
+            case "all":
+                var posts = subCommand.Options.GetValue<long>("posts");
+                args.Posts = posts;
+                response = await activityHelper.GetInactiveUsers(posts, days);
+                break;
+            default:
+                throw new InvalidSubCommandException();
+        }
+
+        var end = DateTimeOffset.UtcNow.DateTime;
+
+        await dbContext.ActivityReports.AddAsync(new ActivityReport {
+            StartTime = start,
+            EndTime = end,
+            Initiator = command.User.Id,
+            Report = response,
+            ReportType = subCommand.Name,
+            Args = JsonSerializer.Serialize(args)
+        });
+        await dbContext.SaveChangesAsync();
 
         if (timedOut)
         {
@@ -126,5 +160,17 @@ public class Activity : ISlashCommand
         {
             await channel.SendMessageAsync(chunk);
         }
+    }
+
+
+    public class Args
+    {
+        public long Days { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ulong? User { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public long? Posts { get; set; }
     }
 }

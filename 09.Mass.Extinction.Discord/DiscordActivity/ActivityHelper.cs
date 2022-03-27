@@ -66,6 +66,8 @@ public class ActivityHelper
             usersActivities.AddOrUpdate(user.Id, userActivity, (_, _) => userActivity);
         });
 
+        _cache.ClearCache(dateToCheck);
+
         var inactiveUsers = usersActivities
             .Values
             .Where(ua => ua.Activity.Sum(a => a.PostCount) < posts)
@@ -113,6 +115,8 @@ public class ActivityHelper
         var dateToCheck = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(days));
         
         var userActivity = await GetUserActivity(member, dateToCheck);
+
+        _cache.ClearCache(dateToCheck);
 
         var messageBuilder = new StringBuilder();
 
