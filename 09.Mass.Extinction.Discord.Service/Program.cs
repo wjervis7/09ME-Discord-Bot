@@ -31,7 +31,7 @@ var host = Host.CreateDefaultBuilder(args)
                 GatewayIntents.DirectMessageReactions
         });
         services.AddSingleton(client);
-        services.AddSingleton<MessageCache>();
+        services.AddScoped<MessageCache>();
         services.AddSingleton<CommandService>();
         // services.AddSingleton<CommandHandlingService>();
         services.AddSingleton(new InteractiveService(client));

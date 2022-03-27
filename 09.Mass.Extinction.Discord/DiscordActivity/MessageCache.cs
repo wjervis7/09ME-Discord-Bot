@@ -18,6 +18,15 @@
             _client = client;
         }
 
+        public void ClearCache(DateTimeOffset dateToCheck)
+        {
+            var keys = _messageCache.Keys.Where(s => s.EndsWith(dateToCheck.ToUnixTimeSeconds().ToString()));
+            foreach (var key in keys)
+            {
+                _messageCache.Remove(key, out _);
+            }
+        }
+
         public async Task<List<IMessage>> GetMessages(ulong channelId, DateTimeOffset dateToCheck)
         {
             var key = $"{channelId}-{dateToCheck.ToUnixTimeSeconds()}";
