@@ -6,6 +6,7 @@ using Commands;
 using global::Discord;
 using global::Discord.Net;
 using global::Discord.WebSocket;
+using Humanizer;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -20,6 +21,10 @@ public class ActivityHelper
     private readonly List<ulong> _ignoredChannels;
     private readonly List<ulong> _ignoredUsers;
     private readonly List<ulong> _ignoredRoles;
+
+    private const string _postStr = "post";
+    private const string _dayStr = "day";
+    private const string _userStr = "user";
 
     public ActivityHelper(ILogger<Activity> logger, IOptions<DiscordConfiguration> config, DiscordSocketClient client, MessageCache cache)
     {
@@ -78,21 +83,21 @@ public class ActivityHelper
 
         if (inactiveUsers.Count == 0)
         {
-            messageBuilder.AppendLine($"All users have made at least {posts} post(s), within the last {days} day(s).");
+            messageBuilder.AppendLine($"All users have made at least {_postStr.ToQuantity(posts)}, in the last {_dayStr.ToQuantity(days)}.");
         }
         else
         {
-            messageBuilder.AppendLine($"{inactiveUsers.Count} user(s) have not made {posts} post(s), within the last {days} day(s).");
+            messageBuilder.AppendLine($"{_userStr.ToQuantity(inactiveUsers.Count)} have not made {_postStr.ToQuantity(posts)}, in the last {_dayStr.ToQuantity(days)}.");
             foreach (var inactiveUser in inactiveUsers)
             {
                 var totalPosts = inactiveUser.Activity.Sum(a => a.PostCount);
                 if (totalPosts == 0)
                 {
-                    messageBuilder.AppendLine($"> <@!{inactiveUser.UserId}> has not made any posts, in the last {days} day(s).");
+                    messageBuilder.AppendLine($"> <@!{inactiveUser.UserId}> has not made any posts, in the last {_dayStr.ToQuantity(days)}.");
                 }else if (totalPosts < posts)
                 {
                     var latestPost = inactiveUser.Activity.Max(a => a.LastPost);
-                    messageBuilder.AppendLine($"> <@!{inactiveUser.UserId}> has made {totalPosts} post(s), with the last post on <t:{latestPost!.Value.ToUnixTimeSeconds()}:f>.");
+                    messageBuilder.AppendLine($"> <@!{inactiveUser.UserId}> has made {_postStr.ToQuantity(totalPosts)}, with the last post on <t:{latestPost!.Value.ToUnixTimeSeconds()}:f>.");
                 }
             }
         }
@@ -122,7 +127,7 @@ public class ActivityHelper
 
         if (userActivity.Activity.Any())
         {
-            messageBuilder.AppendLine($"<@!{member.Id}>'s activity, over the last {days} day(s):");
+            messageBuilder.AppendLine($"<@!{member.Id}>'s activity, in the last {_dayStr.ToQuantity(days)}:");
             foreach (var activity in userActivity.Activity)
             {
                 if (activity is UserThreadActivity threadActivity)
@@ -134,12 +139,12 @@ public class ActivityHelper
                     messageBuilder.Append($"> In <#{activity.Id}>: ");
                 }
 
-                messageBuilder.AppendLine($"{activity.PostCount} post(s), with the most recent one on <t:{activity.LastPost!.Value.ToUnixTimeSeconds()}:f>.");
+                messageBuilder.AppendLine($"{_postStr.ToQuantity(activity.PostCount)}, with the most recent one on <t:{activity.LastPost!.Value.ToUnixTimeSeconds()}:f>.");
             }
         }
         else
         {
-            messageBuilder.AppendLine($"<@!{member.Id}> has not made any posts, in the last {days} day(s).");
+            messageBuilder.AppendLine($"<@!{member.Id}> has not made any posts, in the last {_dayStr.ToQuantity(days)}.");
         }
         
 
