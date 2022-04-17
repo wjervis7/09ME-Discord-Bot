@@ -73,7 +73,7 @@ public class Activity : ISlashCommand
             }
         };
 
-    public async Task Handle(SocketSlashCommand command)
+    public async void Handle(SocketSlashCommand command)
     {
         await command.DeferAsync();
         await using var scope = _serviceProvider.CreateAsyncScope();

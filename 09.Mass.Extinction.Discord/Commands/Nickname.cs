@@ -40,7 +40,7 @@ public class Nickname : ISlashCommand
             }
         };
 
-    public async Task Handle(SocketSlashCommand command)
+    public async void Handle(SocketSlashCommand command)
     {
         var user = command.Data.Options.GetValue<SocketGuildUser>("user");
         var nickName = command.Data.Options.GetNullableValue<string>("name");

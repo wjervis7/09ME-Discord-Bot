@@ -45,7 +45,7 @@ public class TimeZone : ISlashCommand
             }
         };
 
-    public async Task Handle(SocketSlashCommand command)
+    public async void Handle(SocketSlashCommand command)
     {
         _logger.LogDebug("Entering command handler.");
         await using var scope = _serviceProvider.CreateAsyncScope();

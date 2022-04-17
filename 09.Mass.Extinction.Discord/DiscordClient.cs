@@ -59,6 +59,7 @@ public class DiscordClient
                 var command = await Guild.CreateApplicationCommandAsync(commandBuilder.Build());
                 if (slashCommand.Permissions.Any())
                 {
+                    slashCommand.Permissions.Add(new ApplicationCommandPermission(Guild.EveryoneRole, false));
                     permissions.Add(command.Id, slashCommand.Permissions.ToArray());
                 }
                 _logger.LogInformation("Slash command created/updated.");
@@ -101,7 +102,10 @@ public class DiscordClient
                 }
 
                 _logger.LogDebug("Executing slash command {slashCommand}.", slashCommand.Name);
-                return slashCommand.Handle(command);
+
+                slashCommand.Handle(command);
+
+                return Task.CompletedTask;
             }
         };
 

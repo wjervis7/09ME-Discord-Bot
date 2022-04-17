@@ -9,7 +9,7 @@ public interface ISlashCommand
     string Description { get; }
     SlashCommandOptionBuilder[] Options { get; }
     List<ApplicationCommandPermission> Permissions { get; }
-    Task Handle(SocketSlashCommand command);
+    void Handle(SocketSlashCommand command);
     static bool IsInvalidUsage(CommandConfiguration? commandConfiguration, SocketInteraction command, out string message)
     {
         message = "";
@@ -62,8 +62,6 @@ public interface ISlashCommand
         {
             return permissions;
         }
-
-        permissions.Add(new ApplicationCommandPermission(configuration.EveryoneId, ApplicationCommandPermissionTarget.Role, true));
 
         permissions.AddRange(commandOptions.Options.AllowedRoles.Select(role => new ApplicationCommandPermission(role, ApplicationCommandPermissionTarget.Role, true)));
 
