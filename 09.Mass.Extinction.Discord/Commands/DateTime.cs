@@ -56,7 +56,7 @@ public class DateTime : ISlashCommand
 
     public List<ApplicationCommandPermission> Permissions { get; } = new ();
 
-    public async Task Handle(SocketSlashCommand command)
+    public async void Handle(SocketSlashCommand command)
     {
         _logger.LogDebug("Entering command handler.");
 
