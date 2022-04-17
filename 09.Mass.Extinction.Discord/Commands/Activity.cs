@@ -11,6 +11,7 @@ using global::Discord.WebSocket;
 using Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 public class Activity : ISlashCommand
 {
@@ -18,14 +19,17 @@ public class Activity : ISlashCommand
     private readonly ILogger<Activity> _logger;
     private readonly IServiceProvider _serviceProvider;
 
-    public Activity(ILogger<Activity> logger, IServiceProvider serviceProvider)
+    public Activity(ILogger<Activity> logger, IServiceProvider serviceProvider, IOptionsMonitor<DiscordConfiguration> configurationMonitor)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
+        var configuration = configurationMonitor.CurrentValue;
+        Permissions = ISlashCommand.SetPermissions(configuration, Name);
     }
 
     public string Name => "activity";
     public string Description => "Gets user Discord activity.";
+    public List<ApplicationCommandPermission> Permissions { get; }
 
     public SlashCommandOptionBuilder[] Options =>
         new[] {

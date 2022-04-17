@@ -32,6 +32,7 @@ public class Time : ISlashCommand
 
     public string Name => "time";
     public string Description => "Displays the provided time, in the Discord time format.";
+    public List<ApplicationCommandPermission> Permissions { get; } = new();
 
     public async Task Handle(SocketSlashCommand command)
     {
