@@ -21,6 +21,7 @@ public class TimeZone : ISlashCommand
 
     public string Name => "time-zone";
     public string Description => "Set or remove your timezone.";
+    public List<ApplicationCommandPermission> Permissions { get; } = new();
 
     public SlashCommandOptionBuilder[] Options =>
         new[] {

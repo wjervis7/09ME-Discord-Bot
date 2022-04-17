@@ -6,18 +6,23 @@ using global::Discord.Net;
 using global::Discord.WebSocket;
 using Helpers;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 public class Nickname : ISlashCommand
 {
     private readonly ILogger<Nickname> _logger;
 
-    public Nickname(ILogger<Nickname> logger)
+    public Nickname(ILogger<Nickname> logger, IOptionsMonitor<DiscordConfiguration> configurationMonitor)
     {
         _logger = logger;
+        var configuration = configurationMonitor.CurrentValue;
+        Permissions = ISlashCommand.SetPermissions(configuration, Name);
     }
 
     public string Name => "nickname";
     public string Description => "Sets nickname for a user.";
+    public List<ApplicationCommandPermission> Permissions { get; }
+
 
     public SlashCommandOptionBuilder[] Options =>
         new[] {

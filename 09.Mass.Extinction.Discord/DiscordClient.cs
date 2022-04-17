@@ -48,15 +48,19 @@ public class DiscordClient
     {
         _logger.LogInformation("Client started.");
         Guild = _client.GetGuild(_configurationMonitor.CurrentValue.GuildId);
-
+        var permissions = new Dictionary<ulong, ApplicationCommandPermission[]>();
         // setup slash commands
         foreach (var (name, slashCommand) in _slashCommands)
         {
             _logger.LogInformation("Creating/updating slash command {command}.", name);
-            var command = CreateSlashCommand(slashCommand);
+            var commandBuilder = CreateSlashCommand(slashCommand);
             try
             {
-                await Guild.CreateApplicationCommandAsync(command.Build());
+                var command = await Guild.CreateApplicationCommandAsync(commandBuilder.Build());
+                if (slashCommand.Permissions.Any())
+                {
+                    permissions.Add(command.Id, slashCommand.Permissions.ToArray());
+                }
                 _logger.LogInformation("Slash command created/updated.");
             }
             catch (HttpException exception)
@@ -65,6 +69,8 @@ public class DiscordClient
                 _logger.LogError(exception, "An error has occurred adding the command, {command}:\n{error}.", name, json);
             }
         }
+
+        await _client.Rest.BatchEditGuildCommandPermissions(Guild.Id, permissions);
 
         _client.SlashCommandExecuted += command =>
         {
@@ -114,8 +120,18 @@ public class DiscordClient
         command.WithName(slashCommand.Name);
         command.WithDescription(slashCommand.Description);
         command.AddOptions(slashCommand.Options);
-        command.WithDefaultPermission(true);
-        command.IsDefaultPermission = true;
+
+        if (slashCommand.Permissions.Any())
+        {
+            command.WithDefaultPermission(false);
+            command.IsDefaultPermission = false;
+        }
+        else
+        {
+            command.WithDefaultPermission(true);
+            command.IsDefaultPermission = true;
+        }
+
         return command;
     }
 

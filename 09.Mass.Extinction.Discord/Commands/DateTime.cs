@@ -54,6 +54,8 @@ public class DateTime : ISlashCommand
     public string Name => "date-time";
     public string Description => "Displays the provided datetime, in the Discord time format.";
 
+    public List<ApplicationCommandPermission> Permissions { get; } = new ();
+
     public async Task Handle(SocketSlashCommand command)
     {
         _logger.LogDebug("Entering command handler.");

@@ -7,7 +7,8 @@ public interface ISlashCommand
 {
     string Name { get; }
     string Description { get; }
-    public SlashCommandOptionBuilder[] Options { get; }
+    SlashCommandOptionBuilder[] Options { get; }
+    List<ApplicationCommandPermission> Permissions { get; }
     Task Handle(SocketSlashCommand command);
     static bool IsInvalidUsage(CommandConfiguration? commandConfiguration, SocketInteraction command, out string message)
     {
@@ -51,5 +52,23 @@ public interface ISlashCommand
 
         message = "You are not authorized to use this command.";
         return true;
+    }
+
+    static List<ApplicationCommandPermission> SetPermissions(DiscordConfiguration configuration, string name)
+    {
+        var permissions = new List<ApplicationCommandPermission>();
+        var commandOptions = configuration.CommandConfiguration.FirstOrDefault(c => c.Command == name);
+        if (commandOptions == null)
+        {
+            return permissions;
+        }
+
+        permissions.Add(new ApplicationCommandPermission(configuration.EveryoneId, ApplicationCommandPermissionTarget.Role, true));
+
+        permissions.AddRange(commandOptions.Options.AllowedRoles.Select(role => new ApplicationCommandPermission(role, ApplicationCommandPermissionTarget.Role, true)));
+
+        permissions.AddRange(commandOptions.Options.AllowedUsers.Select(user => new ApplicationCommandPermission(user, ApplicationCommandPermissionTarget.User, true)));
+
+        return permissions;
     }
 }
