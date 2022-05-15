@@ -27,6 +27,13 @@ public class Time : ISlashCommand
                 Description = "The time you want to have displayed.",
                 Type = ApplicationCommandOptionType.String,
                 IsRequired = true
+            },
+            new SlashCommandOptionBuilder
+            {
+                Name = "message",
+                Description = "Message to display the formatted time with. Use $$ to indicate where the time should go.",
+                Type = ApplicationCommandOptionType.String,
+                IsRequired = false
             }
         };
 
@@ -53,13 +60,14 @@ public class Time : ISlashCommand
 
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById(user.TimeZone);
         var timeStr = command.Data.Options.GetValue<string>("time");
+        var message = command.Data.Options.GetNullableValue<string?>("message");
 
         _logger.LogDebug("Try parse datetime.");
         _logger.LogInformation("Attempting to parse {time}, in time zone {timeZone}.", timeStr, timeZone.Id);
         try
         {
             var (hour, minute) = DateTimeHelper.ParseTime(timeStr);
-            var response = DateTimeHelper.DisplayTime(timeZone, hour, minute);
+            var response = DateTimeHelper.DisplayTime(timeZone, hour, minute, message);
             await command.RespondAsync(response);
         }
         catch (ArgumentException e)
