@@ -24,13 +24,17 @@ public class TimeZone : ISlashCommand
     public List<ApplicationCommandPermission> Permissions { get; } = new();
 
     public SlashCommandOptionBuilder[] Options =>
-        new[] {
-            new SlashCommandOptionBuilder {
+        new[]
+        {
+            new SlashCommandOptionBuilder
+            {
                 Name = "set",
                 Description = "Sets your time zone.",
                 Type = ApplicationCommandOptionType.SubCommand,
-                Options = new List<SlashCommandOptionBuilder> {
-                    new() {
+                Options = new List<SlashCommandOptionBuilder>
+                {
+                    new()
+                    {
                         Name = "zone",
                         Description = "The name of your time zone.",
                         Type = ApplicationCommandOptionType.String,
@@ -38,7 +42,8 @@ public class TimeZone : ISlashCommand
                     }
                 }
             },
-            new SlashCommandOptionBuilder {
+            new SlashCommandOptionBuilder
+            {
                 Name = "remove",
                 Description = "Removes your time zone.",
                 Type = ApplicationCommandOptionType.SubCommand
@@ -53,7 +58,8 @@ public class TimeZone : ISlashCommand
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         var subCommand = command.Data.Options.First();
-        var response = subCommand.Name switch {
+        var response = subCommand.Name switch
+        {
             "set" => await SetTimeZone(context, command.User.Id, subCommand.Options.GetValue<string>("zone")),
             "remove" => await RemoveTimeZone(context, command.User.Id),
             _ => throw new ArgumentOutOfRangeException()
@@ -87,9 +93,10 @@ public class TimeZone : ISlashCommand
         if (user == null)
         {
             _logger.LogInformation("User not found; creating user.");
-            user = new DiscordUser {
+            user = context.DiscordUsers.Add(new DiscordUser
+            {
                 Id = userId
-            };
+            }).Entity;
         }
 
         _logger.LogInformation("Setting user's time zone.");

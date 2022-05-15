@@ -44,7 +44,8 @@ public class ZohoEmailSender : IEmailSender
         mimeMessage.From.Add(new MailboxAddress(Encoding.UTF8, Options.Sender.Name, Options.Sender.Email));
         mimeMessage.To.Add(MailboxAddress.Parse(email));
         mimeMessage.Subject = subject;
-        mimeMessage.Body = new TextPart(TextFormat.Html) {
+        mimeMessage.Body = new TextPart(TextFormat.Html)
+        {
             Text = message
         };
 

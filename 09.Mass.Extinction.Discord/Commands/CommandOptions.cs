@@ -1,5 +1,8 @@
-﻿namespace _09.Mass.Extinction.Discord.Commands;
+﻿// ReSharper disable CollectionNeverUpdated.Global
 
+namespace _09.Mass.Extinction.Discord.Commands;
+
+// ReSharper disable once ClassNeverInstantiated.Global
 public class CommandOptions
 {
     public List<ulong> AllowedRoles { get; } = new();

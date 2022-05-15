@@ -24,9 +24,11 @@ public class IndexModel : PageModel
 
     public string UserName { get; set; }
 
-    [TempData] public string StatusMessage { get; set; }
+    [TempData]
+    public string StatusMessage { get; set; }
 
-    [BindProperty] public InputModel Input { get; set; }
+    [BindProperty]
+    public InputModel Input { get; set; }
 
     private async Task LoadAsync(ApplicationUser user)
     {
@@ -35,7 +37,8 @@ public class IndexModel : PageModel
 
         UserName = userName;
 
-        Input = new InputModel {
+        Input = new InputModel
+        {
             Name = user.Name,
             ProfilePicture = user.ProfilePicture,
             PhoneNumber = phoneNumber
@@ -103,7 +106,8 @@ public class IndexModel : PageModel
         [Display(Name = "Username")]
         public string Name { get; set; }
 
-        [Display(Name = "Profile Picture")] public string ProfilePicture { get; set; }
+        [Display(Name = "Profile Picture")]
+        public string ProfilePicture { get; set; }
 
         [Phone]
         [Display(Name = "Phone number")]

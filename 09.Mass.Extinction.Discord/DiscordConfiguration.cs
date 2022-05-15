@@ -8,6 +8,8 @@ public class DiscordConfiguration
     public string Token { get; set; }
     public ulong GuildId { get; set; }
     public ulong AdminChannelId { get; set; }
+
+    // ReSharper disable once CollectionNeverUpdated.Global
     public List<CommandConfiguration> CommandConfiguration { get; set; }
     public ulong EveryoneId { get; set; }
 }
