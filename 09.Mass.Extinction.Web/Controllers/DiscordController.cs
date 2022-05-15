@@ -12,15 +12,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ViewModels.Discord;
-using ActivityReport = ViewModels.Discord.ActivityReport;
 
 [Authorize(Roles = "DiscordAdmin")]
 public class DiscordController : Controller
 {
-    private readonly ApplicationDbContext _context;
-    private readonly DiscordService _discord;
     private static readonly Regex _channelRegex = new("(?<=\\<\\#)(.*?)(?=\\>)");
     private static readonly Regex _userRegex = new("(?<=\\\"user\\\"\\:\\\")(\\d*)(?=\\\")");
+    private readonly ApplicationDbContext _context;
+    private readonly DiscordService _discord;
 
     public DiscordController(ApplicationDbContext context, DiscordService discord)
     {
@@ -31,7 +30,8 @@ public class DiscordController : Controller
     [HttpGet]
     public async Task<IActionResult> Messages()
     {
-        var messages = await _context.Messages.Select(m => new AdminMessage {
+        var messages = await _context.Messages.Select(m => new AdminMessage
+        {
             Id = m.Id,
             Sender = m.Sender,
             Body = m.Body,
@@ -57,7 +57,8 @@ public class DiscordController : Controller
     [HttpGet]
     public async Task<IActionResult> ActivityReports()
     {
-        var reports = await _context.ActivityReports.Select(ar => new ActivityReport {
+        var reports = await _context.ActivityReports.Select(ar => new ActivityReport
+        {
             Id = ar.Id,
             InitiatorId = ar.Initiator,
             StartTime = ((DateTimeOffset)ar.StartTime).ToUnixTimeSeconds(),
@@ -114,7 +115,6 @@ public class DiscordController : Controller
 
     private static string ReplaceChannelIdsWithNames(string report, IReadOnlyCollection<DiscordChannel> channels)
     {
-
         var newReport = report;
         foreach (Match match in _channelRegex.Matches(report))
         {
@@ -124,8 +124,10 @@ public class DiscordController : Controller
             {
                 continue;
             }
+
             newReport = newReport.Replace($"<#{match.Value}>", channel.Name);
         }
+
         return newReport;
     }
 }

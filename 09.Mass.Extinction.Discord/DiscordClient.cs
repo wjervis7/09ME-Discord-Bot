@@ -11,13 +11,11 @@ using Microsoft.Extensions.Options;
 
 public class DiscordClient
 {
-    private readonly ILogger<DiscordClient> _logger;
-    private readonly IOptionsMonitor<DiscordConfiguration> _configurationMonitor;
     private readonly DiscordSocketClient _client;
+    private readonly IOptionsMonitor<DiscordConfiguration> _configurationMonitor;
+    private readonly ILogger<DiscordClient> _logger;
     private readonly IEnumerable<IMessageHandler> _messageHandlers;
     private readonly Dictionary<string, ISlashCommand> _slashCommands;
-
-    public static SocketGuild Guild { get; private set; }
 
     public DiscordClient(ILogger<DiscordClient> logger, IOptionsMonitor<DiscordConfiguration> configurationMonitor, DiscordSocketClient client, IEnumerable<ISlashCommand> slashCommands, IEnumerable<IMessageHandler> messageHandlers)
     {
@@ -29,8 +27,11 @@ public class DiscordClient
         {
             _slashCommands.Add(slashCommand.Name, slashCommand);
         }
+
         _messageHandlers = messageHandlers;
     }
+
+    public static SocketGuild Guild { get; private set; }
 
     public async Task StartClient()
     {
@@ -48,6 +49,7 @@ public class DiscordClient
     {
         _logger.LogInformation("Client started.");
         Guild = _client.GetGuild(_configurationMonitor.CurrentValue.GuildId);
+        _logger.LogInformation("Connected to guild {guild}:{guildName}", Guild.Id, Guild.Name);
         var permissions = new Dictionary<ulong, ApplicationCommandPermission[]>();
         // setup slash commands
         foreach (var (name, slashCommand) in _slashCommands)
@@ -62,6 +64,7 @@ public class DiscordClient
                     slashCommand.Permissions.Add(new ApplicationCommandPermission(Guild.EveryoneRole, false));
                     permissions.Add(command.Id, slashCommand.Permissions.ToArray());
                 }
+
                 _logger.LogInformation("Slash command created/updated.");
             }
             catch (HttpException exception)
@@ -71,16 +74,27 @@ public class DiscordClient
             }
         }
 
-        await _client.Rest.BatchEditGuildCommandPermissions(Guild.Id, permissions);
+        if (permissions.Any())
+        {
+            await _client.Rest.BatchEditGuildCommandPermissions(Guild.Id, permissions);
+        }
 
         _client.SlashCommandExecuted += command =>
         {
-            var loggerScope = new Dictionary<string, object> 
+            var loggerScope = new Dictionary<string, object>
             {
-                { "channel", command.Channel.Id },
-                { "caller", command.User.Id },
-                { "command", command.CommandName },
-                { "options", command.Data.Options }
+                {
+                    "channel", command.Channel.Id
+                },
+                {
+                    "caller", command.User.Id
+                },
+                {
+                    "command", command.CommandName
+                },
+                {
+                    "options", command.Data.Options
+                }
             };
             using (_logger.BeginScope(loggerScope))
             {

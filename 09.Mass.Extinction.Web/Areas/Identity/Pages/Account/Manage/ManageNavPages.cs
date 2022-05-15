@@ -1,5 +1,7 @@
 ﻿// ReSharper disable UnusedMember.Global
 
+// ReSharper disable MemberCanBePrivate.Global
+
 namespace _09.Mass.Extinction.Web.Areas.Identity.Pages.Account.Manage;
 
 using System;

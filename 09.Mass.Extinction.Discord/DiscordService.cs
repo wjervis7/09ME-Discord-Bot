@@ -1,11 +1,7 @@
 ﻿namespace _09.Mass.Extinction.Discord;
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Responses;
@@ -29,11 +25,11 @@ public class DiscordService
         {
             throw new ArgumentException("Cannot be empty", nameof(ids));
         }
-        
+
         _logger.LogTrace("Getting users with ids: {ids}", ids);
         var users = new List<DiscordGuildMember>();
 
-        var discordUsers = (await GetFromDiscord<DiscordGuildMember>(new HashSet<string>(ids.Select(id=> $"guilds/{_config.GuildId}/members/{id}")))).ToList();
+        var discordUsers = (await GetFromDiscord<DiscordGuildMember>(new HashSet<string>(ids.Select(id => $"guilds/{_config.GuildId}/members/{id}")))).ToList();
 
         if (!discordUsers.Any())
         {
@@ -50,7 +46,7 @@ public class DiscordService
         {
             throw new ArgumentException("Cannot be empty", nameof(userNames));
         }
-        
+
         _logger.LogTrace("Getting users with usernames: {usernames}", userNames);
         var users = new List<DiscordGuildMember>();
 
@@ -92,7 +88,7 @@ public class DiscordService
 
         _logger.LogTrace("Creating and sending requests.");
         var requests = urls
-            .Select(GetFromDiscord)                     
+            .Select(GetFromDiscord)
             .ToList();
         _logger.LogTrace("Requests created and sent.");
 

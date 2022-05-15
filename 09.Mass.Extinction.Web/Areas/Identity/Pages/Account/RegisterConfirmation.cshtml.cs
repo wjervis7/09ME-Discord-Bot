@@ -48,7 +48,8 @@ public class RegisterConfirmationModel : PageModel
         EmailConfirmationUrl = Url.Page(
             "/Account/ConfirmEmail",
             null,
-            new {
+            new
+            {
                 area = "Identity",
                 userId,
                 code,

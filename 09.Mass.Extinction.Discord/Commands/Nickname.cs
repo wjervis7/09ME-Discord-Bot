@@ -25,14 +25,17 @@ public class Nickname : ISlashCommand
 
 
     public SlashCommandOptionBuilder[] Options =>
-        new[] {
-            new SlashCommandOptionBuilder {
+        new[]
+        {
+            new SlashCommandOptionBuilder
+            {
                 Name = "user",
                 Description = "The user whose nickname will be changed.",
                 Type = ApplicationCommandOptionType.User,
                 IsRequired = true
             },
-            new SlashCommandOptionBuilder {
+            new SlashCommandOptionBuilder
+            {
                 Name = "name",
                 Description = "The new nickname for the user. If not included, nickname will be cleared.",
                 Type = ApplicationCommandOptionType.String,
