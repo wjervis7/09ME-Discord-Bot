@@ -1,8 +1,9 @@
-﻿namespace _09.Mass.Extinction.Discord.DiscordActivity;
+﻿namespace _09.Mass.Extinction.Discord.Helpers;
 
 using System.Collections.Concurrent;
 using System.Text;
 using Commands;
+using DiscordActivity;
 using global::Discord;
 using global::Discord.Net;
 using global::Discord.WebSocket;
@@ -12,19 +13,18 @@ using Microsoft.Extensions.Options;
 
 public class ActivityHelper
 {
-    private readonly ILogger<Activity> _logger;
-    private readonly DiscordSocketClient _client;
-    private readonly DiscordConfiguration _config;
-    private readonly MessageCache _cache;
-
-    private readonly ConcurrentDictionary<ulong, byte> _erroredChannels = new();
-    private readonly List<ulong> _ignoredChannels;
-    private readonly List<ulong> _ignoredUsers;
-    private readonly List<ulong> _ignoredRoles;
-
     private const string _postStr = "post";
     private const string _dayStr = "day";
     private const string _userStr = "user";
+    private readonly MessageCache _cache;
+    private readonly DiscordSocketClient _client;
+    private readonly DiscordConfiguration _config;
+
+    private readonly ConcurrentDictionary<ulong, byte> _erroredChannels = new();
+    private readonly List<ulong> _ignoredChannels;
+    private readonly List<ulong> _ignoredRoles;
+    private readonly List<ulong> _ignoredUsers;
+    private readonly ILogger<Activity> _logger;
 
     public ActivityHelper(ILogger<Activity> logger, IOptions<DiscordConfiguration> config, DiscordSocketClient client, MessageCache cache)
     {
@@ -39,7 +39,7 @@ public class ActivityHelper
         var ignoredUsersStr = commandConfig?.AdditionalSettings["ExcludedUsers"] ?? "";
         _ignoredUsers = ignoredUsersStr.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(ulong.Parse).ToList();
         var ignoredRolesStr = commandConfig?.AdditionalSettings["ExcludedRoles"] ?? "";
-        _ignoredRoles = ignoredRolesStr.Split(",", StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries).Select(ulong.Parse).ToList();
+        _ignoredRoles = ignoredRolesStr.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(ulong.Parse).ToList();
     }
 
     public async Task<string> GetInactiveUsers(long posts, long days)
@@ -94,7 +94,8 @@ public class ActivityHelper
                 if (totalPosts == 0)
                 {
                     messageBuilder.AppendLine($"> <@!{inactiveUser.UserId}> has not made any posts, in the last {_dayStr.ToQuantity(days)}.");
-                }else if (totalPosts < posts)
+                }
+                else if (totalPosts < posts)
                 {
                     var latestPost = inactiveUser.Activity.Max(a => a.LastPost);
                     messageBuilder.AppendLine($"> <@!{inactiveUser.UserId}> has made {_postStr.ToQuantity(totalPosts)}, with the last post on <t:{latestPost!.Value.ToUnixTimeSeconds()}:f>.");
@@ -118,7 +119,7 @@ public class ActivityHelper
     public async Task<string> GetUserActivity(SocketGuildUser member, long days)
     {
         var dateToCheck = DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(days));
-        
+
         var userActivity = await GetUserActivity(member, dateToCheck);
 
         _cache.ClearCache(dateToCheck);
@@ -146,7 +147,7 @@ public class ActivityHelper
         {
             messageBuilder.AppendLine($"<@!{member.Id}> has not made any posts, in the last {_dayStr.ToQuantity(days)}.");
         }
-        
+
 
         // ReSharper disable once InvertIf
         if (_erroredChannels.Any())
@@ -166,7 +167,8 @@ public class ActivityHelper
         var guild = _client.GetGuild(_config.GuildId);
         var channels = guild.TextChannels.Where(c => !_ignoredChannels.Contains(c.Id));
 
-        var userActivity = new UserActivity {
+        var userActivity = new UserActivity
+        {
             UserId = member.Id,
             Nickname = member.Nickname,
             Activity = new List<UserChannelActivity>()
@@ -235,7 +237,7 @@ public class ActivityHelper
             activity.Id = channelId;
             activity.LastPost = latestMessage;
             activity.PostCount = userMessages.Count;
-            
+
             _logger.LogInformation("Found activity, for user, {user}, in channel, {channel}.", userId, channelId);
             return activity;
         }

@@ -2,8 +2,8 @@ namespace _09.Mass.Extinction.Discord.Service;
 
 public class Worker : BackgroundService
 {
-    private readonly ILogger<Worker> _logger;
     private readonly DiscordClient _discordClient;
+    private readonly ILogger<Worker> _logger;
 
     public Worker(ILogger<Worker> logger, DiscordClient discordClient)
     {

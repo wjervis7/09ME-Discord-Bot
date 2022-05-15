@@ -93,7 +93,8 @@ public class LoginModel : PageModel
 
         if (result.RequiresTwoFactor)
         {
-            return RedirectToPage("./LoginWith2fa", new {
+            return RedirectToPage("./LoginWith2fa", new
+            {
                 ReturnUrl = returnUrl,
                 Input.RememberMe
             });

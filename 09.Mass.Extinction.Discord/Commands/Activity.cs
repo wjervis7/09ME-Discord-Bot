@@ -4,13 +4,13 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Data;
 using Data.Entities;
-using DiscordActivity;
 using Exceptions;
 using global::Discord;
 using global::Discord.WebSocket;
 using Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 public class Activity : ISlashCommand
 {
@@ -18,29 +18,37 @@ public class Activity : ISlashCommand
     private readonly ILogger<Activity> _logger;
     private readonly IServiceProvider _serviceProvider;
 
-    public Activity(ILogger<Activity> logger, IServiceProvider serviceProvider)
+    public Activity(ILogger<Activity> logger, IServiceProvider serviceProvider, IOptionsMonitor<DiscordConfiguration> configurationMonitor)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
+        var configuration = configurationMonitor.CurrentValue;
+        Permissions = ISlashCommand.SetPermissions(configuration, Name);
     }
 
     public string Name => "activity";
     public string Description => "Gets user Discord activity.";
+    public List<ApplicationCommandPermission> Permissions { get; }
 
     public SlashCommandOptionBuilder[] Options =>
-        new[] {
-            new SlashCommandOptionBuilder {
+        new[]
+        {
+            new SlashCommandOptionBuilder
+            {
                 Name = "all",
                 Description = "Gets all users, that haven't made x number of posts, in the last y days.",
                 Type = ApplicationCommandOptionType.SubCommand,
-                Options = new List<SlashCommandOptionBuilder> {
-                    new() {
+                Options = new List<SlashCommandOptionBuilder>
+                {
+                    new()
+                    {
                         Name = "posts",
                         Description = "The minimum number of posts, that the user must make, to be considered active.",
                         Type = ApplicationCommandOptionType.Integer,
                         IsRequired = true
                     },
-                    new() {
+                    new()
+                    {
                         Name = "days",
                         Description = "The number of days, that the user must have posted within, to be considered active.",
                         Type = ApplicationCommandOptionType.Integer,
@@ -48,18 +56,22 @@ public class Activity : ISlashCommand
                     }
                 }
             },
-            new SlashCommandOptionBuilder {
+            new SlashCommandOptionBuilder
+            {
                 Name = "user",
                 Description = "Gets how active a user is, within the last x days.",
                 Type = ApplicationCommandOptionType.SubCommand,
-                Options = new List<SlashCommandOptionBuilder> {
-                    new() {
+                Options = new List<SlashCommandOptionBuilder>
+                {
+                    new()
+                    {
                         Name = "user",
                         Description = "The user to check activity for.",
                         Type = ApplicationCommandOptionType.User,
                         IsRequired = true
                     },
-                    new() {
+                    new()
+                    {
                         Name = "days",
                         Description = "The number of days, to check the user's activity.",
                         Type = ApplicationCommandOptionType.Integer,
@@ -69,7 +81,7 @@ public class Activity : ISlashCommand
             }
         };
 
-    public async Task Handle(SocketSlashCommand command)
+    public async void Handle(SocketSlashCommand command)
     {
         await command.DeferAsync();
         await using var scope = _serviceProvider.CreateAsyncScope();
@@ -83,7 +95,8 @@ public class Activity : ISlashCommand
         var subCommand = command.Data.Options.First();
         string? response;
         var days = subCommand.Options.GetValue<long>("days");
-        var args = new Args {
+        var args = new Args
+        {
             Days = days
         };
         switch (subCommand.Name)
@@ -104,7 +117,8 @@ public class Activity : ISlashCommand
 
         var end = DateTimeOffset.UtcNow.DateTime;
 
-        await dbContext.ActivityReports.AddAsync(new ActivityReport {
+        await dbContext.ActivityReports.AddAsync(new ActivityReport
+        {
             StartTime = start,
             EndTime = end,
             Initiator = command.User.Id,
@@ -163,8 +177,9 @@ public class Activity : ISlashCommand
     }
 
 
-    public class Args
+    private class Args
     {
+        // ReSharper disable UnusedAutoPropertyAccessor.Local
         public long Days { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -172,5 +187,6 @@ public class Activity : ISlashCommand
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public long? Posts { get; set; }
+        // ReSharper restore UnusedAutoPropertyAccessor.Local
     }
 }

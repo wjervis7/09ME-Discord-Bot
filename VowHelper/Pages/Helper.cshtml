@@ -1,0 +1,65 @@
+﻿@page
+@model VowHelper.Pages.HelperModel
+@{
+    ViewData["Title"] = "Vow of the Disciple - Bonus Chest - Helper";
+}
+<div id="app">
+    <p>Select your symbols, below:</p>
+
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label col-form-label-sm" for="symbol1">Symbol 1</label>
+        <div class="col-sm-10">
+            <select class="form-select form-select-sm" id="symbol1" v-model="symbol1Val">
+                <option v-for="symbol in symbols" :value="symbol.symbol" :label="symbol.symbol"></option>
+            </select>
+        </div>
+    </div>
+
+
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label col-form-label-sm" for="symbol2">Symbol 2</label>
+        <div class="col-sm-10">
+            <select class="form-select form-select-sm" id="symbol2" v-model="symbol2Val">
+                <option v-for="symbol in symbols" :value="symbol.symbol" :label="symbol.symbol"></option>
+            </select>
+        </div>
+    </div>
+
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label col-form-label-sm" for="symbol3">Symbol 3:</label>
+        <div class="col-sm-10">
+            <select class="form-select form-select-sm" id="symbol3" v-model="symbol3Val">
+                <option v-for="symbol in symbols" :value="symbol.symbol" :label="symbol.symbol"></option>
+            </select>
+        </div>
+    </div>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">Symbol</th>
+            <th scope="col">Location</th>
+            <th scope="col">Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-if="selectedSymbols.length" v-for="symbol in selectedSymbols">
+            <td><img :src="symbol.image" :alt="symbol.symbol" /></td>
+            <td>{{ symbol.location }}</td>
+            <td>{{ symbol.description }}</td>
+        </tr>
+        <tr v-else>
+            <td colspan="3" class="text-center">Select a symbol</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+@section Scripts
+{
+    <script type="module">
+    import {app} from "/js/site.js";
+    
+    app.mount("#app");
+    </script>
+}

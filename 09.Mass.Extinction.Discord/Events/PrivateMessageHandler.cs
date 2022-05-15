@@ -58,7 +58,8 @@ If so, edit your message, and try sending it, again.
             var config = scope.ServiceProvider.GetRequiredService<IOptions<DiscordConfiguration>>().Value;
 
             _logger.LogDebug("Saving message to database.");
-            await context.Messages.AddAsync(new Message {
+            await context.Messages.AddAsync(new Message
+            {
                 Sender = sender,
                 Body = message.Content,
                 DateSent = DateTime.UtcNow

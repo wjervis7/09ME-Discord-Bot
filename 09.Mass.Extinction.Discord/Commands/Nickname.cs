@@ -6,28 +6,36 @@ using global::Discord.Net;
 using global::Discord.WebSocket;
 using Helpers;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 public class Nickname : ISlashCommand
 {
     private readonly ILogger<Nickname> _logger;
 
-    public Nickname(ILogger<Nickname> logger)
+    public Nickname(ILogger<Nickname> logger, IOptionsMonitor<DiscordConfiguration> configurationMonitor)
     {
         _logger = logger;
+        var configuration = configurationMonitor.CurrentValue;
+        Permissions = ISlashCommand.SetPermissions(configuration, Name);
     }
 
     public string Name => "nickname";
     public string Description => "Sets nickname for a user.";
+    public List<ApplicationCommandPermission> Permissions { get; }
+
 
     public SlashCommandOptionBuilder[] Options =>
-        new[] {
-            new SlashCommandOptionBuilder {
+        new[]
+        {
+            new SlashCommandOptionBuilder
+            {
                 Name = "user",
                 Description = "The user whose nickname will be changed.",
                 Type = ApplicationCommandOptionType.User,
                 IsRequired = true
             },
-            new SlashCommandOptionBuilder {
+            new SlashCommandOptionBuilder
+            {
                 Name = "name",
                 Description = "The new nickname for the user. If not included, nickname will be cleared.",
                 Type = ApplicationCommandOptionType.String,
@@ -35,7 +43,7 @@ public class Nickname : ISlashCommand
             }
         };
 
-    public async Task Handle(SocketSlashCommand command)
+    public async void Handle(SocketSlashCommand command)
     {
         var user = command.Data.Options.GetValue<SocketGuildUser>("user");
         var nickName = command.Data.Options.GetNullableValue<string>("name");
