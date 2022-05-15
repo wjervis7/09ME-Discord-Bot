@@ -49,6 +49,13 @@ public class DateTime : ISlashCommand
                 Description = "The time for the you want to have displayed.",
                 Type = ApplicationCommandOptionType.String,
                 IsRequired = true
+            },
+            new SlashCommandOptionBuilder
+            {
+                Name = "message",
+                Description = "Message to display the formatted date/time with. Use $$ to indicate where the date/time should go.",
+                Type = ApplicationCommandOptionType.String,
+                IsRequired = false
             }
         };
 
@@ -79,6 +86,7 @@ public class DateTime : ISlashCommand
         var month = (int)command.Data.Options.GetValue<long>("month");
         var day = (int)command.Data.Options.GetValue<long>("day");
         var timeStr = command.Data.Options.GetValue<string>("time");
+        var message = command.Data.Options.GetNullableValue<string?>("message");
 
         _logger.LogDebug("Try parse datetime.");
         _logger.LogInformation("Attempting to parse {dateTime}, in time zone {timeZone}.", $"Year: {year}, Month: {month}, Day: {day}, Time: {timeStr}", timeZone.Id);
@@ -86,7 +94,7 @@ public class DateTime : ISlashCommand
         {
             DateTimeHelper.ValidateDate(year, month, day);
             var (hour, minute) = DateTimeHelper.ParseTime(timeStr);
-            var response = DateTimeHelper.DisplayDateTime(timeZone, year, month, day, hour, minute);
+            var response = DateTimeHelper.DisplayDateTime(timeZone, year, month, day, hour, minute, message);
             await command.RespondAsync(response);
         }
         catch (ArgumentException e)

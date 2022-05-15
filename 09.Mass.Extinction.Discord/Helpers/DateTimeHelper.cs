@@ -136,20 +136,22 @@ public static class DateTimeHelper
         }
     }
 
-    public static string DisplayTime(TimeZoneInfo userTimeZone, int hour, int minute)
+    public static string DisplayTime(TimeZoneInfo userTimeZone, int hour, int minute, string? message)
     {
         var now = DateTimeOffset.Now;
 
-        return DisplayDateTime(userTimeZone, now.Year, now.Month, now.Day, hour, minute, "t");
+        return DisplayDateTime(userTimeZone, now.Year, now.Month, now.Day, hour, minute, message, "t");
     }
 
-    public static string DisplayDateTime(TimeZoneInfo userTimeZone, int year, int month, int day, int hour, int minute, string format = "f")
+    public static string DisplayDateTime(TimeZoneInfo userTimeZone, int year, int month, int day, int hour, int minute, string? message, string format = "f")
     {
         Console.WriteLine("Year: {0}, Month: {1}, Day: {2}, Hour: {3}, Minute: {4}", year, month, day, hour, minute);
         var date = new DateTime(year, month, day);
 
         var time = new DateTimeOffset(year, month, day, hour, minute, 0, 0, userTimeZone.GetUtcOffset(date));
 
-        return $"You entered: <t:{time.ToUnixTimeSeconds()}:{format}>";
+        message ??= "You entered: $$";
+
+        return message.Replace("$$", $"<t:{time.ToUnixTimeSeconds()}:{format}>");
     }
 }
