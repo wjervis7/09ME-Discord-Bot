@@ -3,6 +3,7 @@
 # You can learn more about editorconfig here: https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
 [*.cs]
 
+dotnet_diagnostic.cs8618.severity = none
 
 #Core editorconfig formatting - indentation
 
@@ -20,7 +21,7 @@ csharp_new_line_before_members_in_anonymous_types = true
 #require members of object intializers to be on separate lines
 csharp_new_line_before_members_in_object_initializers = true
 #require braces to be on a new line for anonymous_types, methods, control_blocks, types, lambdas, and object_collection_array_initializers (also known as "Allman" style)
-csharp_new_line_before_open_brace = anonymous_types, methods, control_blocks, types, lambdas, object_collection_array_initializers
+csharp_new_line_before_open_brace = all
 
 #Formatting - organize using options
 
@@ -99,7 +100,7 @@ dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggest
 #Style - Modifier preferences
 
 #when this rule is set to a list of modifiers, prefer the specified ordering.
-csharp_preferred_modifier_order = public,private,protected,static,async,readonly,override:suggestion
+csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:suggestion
 
 #Style - qualification options
 
@@ -109,8 +110,11 @@ dotnet_style_qualification_for_field = false:suggestion
 dotnet_style_qualification_for_method = false:suggestion
 #prefer properties not to be prefaced with this. or Me. in Visual Basic
 dotnet_style_qualification_for_property = false:suggestion
-csharp_using_directive_placement=inside_namespace:error
-insert_final_newline=true
+csharp_using_directive_placement = inside_namespace:error
+insert_final_newline = true
+
+# Microsoft .NET properties
+csharp_indent_braces = false
 
 [*.{cs,vb}]
-end_of_line=lf
+end_of_line = lf

@@ -2,5 +2,5 @@
 
 need a PR...
 1
- - [Discord Bot](09.Mass.Extinction.Discord.Bot/README.md)
+ - [Discord Bot](09.Mass.Extinction.Discord.Service/README.md)
  - [Website](09.Mass.Extinction.Web/Readme.md)

@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Data.Entities;
+using Extinction.Data.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -93,7 +93,8 @@ public class LoginModel : PageModel
 
         if (result.RequiresTwoFactor)
         {
-            return RedirectToPage("./LoginWith2fa", new {
+            return RedirectToPage("./LoginWith2fa", new
+            {
                 ReturnUrl = returnUrl,
                 Input.RememberMe
             });

@@ -3,42 +3,39 @@ namespace _09.Mass.Extinction.Web;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Data;
-using Data.Entities;
 using Discord;
 using Email;
+using Extinction.Data;
+using Extinction.Data.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Serilog;
 
-public class Startup
+public static class Startup
 {
-    public Startup(IConfiguration configuration, IHostEnvironment environment)
+    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        Configuration = configuration;
-        Environment = environment;
-    }
+        var connectionStringBuilder = new SqlConnectionStringBuilder(configuration.GetConnectionString("DefaultConnection"));
+        var sqlPassword = configuration.GetValue<string>("sqlpass");
+        if (!string.IsNullOrWhiteSpace(sqlPassword))
+        {
+            connectionStringBuilder.Password = sqlPassword;
+        }
 
-    public IConfiguration Configuration { get; }
-    public IHostEnvironment Environment { get; }
-
-    // This method gets called by the runtime. Use this method to add services to the container.
-    public void ConfigureServices(IServiceCollection services)
-    {
-        var connectionString = Configuration.GetConnectionString("DefaultConnection").Replace("~", Environment.ContentRootPath);
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
+        services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionStringBuilder.ToString()));
         services.AddDatabaseDeveloperPageExceptionFilter();
 
         services.AddTransient<IEmailSender, ZohoEmailSender>();
-        services.Configure<AuthMessageSenderOptions>(Configuration.GetSection("Email"));
+        services.Configure<AuthMessageSenderOptions>(configuration.GetSection("Email"));
 
         services.Configure<IdentityOptions>(options =>
         {
@@ -57,7 +54,7 @@ public class Startup
         services.AddAuthentication()
             .AddDiscord(options =>
             {
-                var discordAuthSection = Configuration.GetSection("Discord");
+                var discordAuthSection = configuration.GetSection("Discord");
                 options.ClientId = discordAuthSection["ClientId"];
                 options.ClientSecret = discordAuthSection["ClientSecret"];
                 options.Scope.Add("email");
@@ -65,13 +62,15 @@ public class Startup
                 options.SaveTokens = true;
             });
 
-        services.Configure<DiscordConfiguration>(Configuration.GetSection("Discord"));
+        services.Configure<DiscordConfiguration>(configuration.GetSection("Discord"));
         services.AddSingleton(provider =>
         {
             var config = provider.GetRequiredService<IOptions<DiscordConfiguration>>().Value;
-            var client = new HttpClient {
+            var client = new HttpClient
+            {
                 BaseAddress = new Uri(config.ApiEndpoint),
-                DefaultRequestHeaders = {
+                DefaultRequestHeaders =
+                {
                     Authorization = AuthenticationHeaderValue.Parse($"Bot {config.Token}")
                 }
             };
@@ -82,8 +81,7 @@ public class Startup
         services.AddControllersWithViews();
     }
 
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public static void ConfigureApp(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())
         {
@@ -102,7 +100,8 @@ public class Startup
 
         app.UseRouting();
 
-        app.UseForwardedHeaders(new ForwardedHeadersOptions {
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
             ForwardedHeaders = ForwardedHeaders.XForwardedProto
         });
 
@@ -116,5 +115,21 @@ public class Startup
                 "{controller=Home}/{action=Index}/{id?}");
             endpoints.MapRazorPages();
         });
+    }
+
+    public static void ConfigureHost(IHostBuilder host)
+    {
+        host.ConfigureAppConfiguration((context, configuration) =>
+        {
+            if (!context.HostingEnvironment.IsEnvironment("Docker"))
+            {
+                return;
+            }
+
+            configuration.AddJsonFile("appsettings.docker.json", false, true);
+            configuration.AddKeyPerFile("/run/secrets", true, true);
+        });
+
+        host.UseSerilog((hostingContext, _, loggerConfiguration) => loggerConfiguration.ReadFrom.Configuration(hostingContext.Configuration));
     }
 }

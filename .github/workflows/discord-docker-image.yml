@@ -25,6 +25,13 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Set output
         id: vars
         run: echo ::set-output name=branch::${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
@@ -36,7 +43,9 @@ jobs:
         id: meta-bot
         uses: docker/metadata-action@v3.6.2
         with:
-          images: ${{ secrets.DOCKER_USERNAME }}/09me-discord
+          images: |
+            ${{ secrets.DOCKER_USERNAME }}/09me-discord
+            ghcr.io/${{ github.repository_owner }}/09me-discord
           flavor: |
             latest=false
           tags: |
@@ -49,7 +58,9 @@ jobs:
         id: meta-web
         uses: docker/metadata-action@v3.6.2
         with:
-          images: ${{ secrets.DOCKER_USERNAME }}/09me-website
+          images: |
+            ${{ secrets.DOCKER_USERNAME }}/09me-website
+            ghcr.io/${{ github.repository_owner }}/09me-website
           flavor: |
             latest=false
           tags: |
@@ -58,13 +69,36 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             
+      - name: Extract metadata (tags, labels) for Docker - web
+        id: meta-vow
+        uses: docker/metadata-action@v3.6.2
+        with:
+          images: |
+            ${{ secrets.DOCKER_USERNAME }}/09me-vow
+            ghcr.io/${{ github.repository_owner }}/09me-vow
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=latest,enable=${{ steps.vars.outputs.branch == 'master' }}
+            type=raw,value=beta,enable=${{ steps.vars.outputs.branch == 'dev' }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}      
+            
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+            
       - name: Build and push Docker image - bot
         uses: docker/build-push-action@v2.8.0
         with:
-          context: 09.Mass.Extinction.Discord.Bot
+          context: .
+          file: 09.Mass.Extinction.Discord.Service/Dockerfile
           push: true
           tags: ${{ steps.meta-bot.outputs.tags }}
           labels: ${{ steps.meta-bot.outputs.labels }}  
+          platforms: linux/amd64,linux/arm64
           
       - name: Build and push Docker image - web
         uses: docker/build-push-action@v2.8.0
@@ -74,3 +108,15 @@ jobs:
           push: true
           tags: ${{ steps.meta-web.outputs.tags }}
           labels: ${{ steps.meta-web.outputs.labels }}  
+          platforms: linux/amd64,linux/arm64
+          
+      - name: Build and push Docker image - vow
+        uses: docker/build-push-action@v2.8.0
+        with:
+          context: .
+          file: VowHelper/Dockerfile
+          push: true
+          tags: ${{ steps.meta-vow.outputs.tags }}
+          labels: ${{ steps.meta-vow.outputs.labels }}  
+          platforms: linux/amd64,linux/arm64
+          

@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "09.Mass.Extinction.Discord.Bot", "09.Mass.Extinction.Discord.Bot\09.Mass.Extinction.Discord.Bot.njsproj", "{1868D698-2B73-4D8F-80BD-C6544C6007E9}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{44B16E39-AEEA-42EB-9E19-56C519934A33}"
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
@@ -18,20 +16,40 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "09.Mass.Extinction.Web", "09.Mass.Extinction.Web\09.Mass.Extinction.Web.csproj", "{D1AC9DC6-4260-4A89-A5BB-B50074F016FE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "09.Mass.Extinction.Data", "09.Mass.Extinction.Data\09.Mass.Extinction.Data.csproj", "{3204CE37-67BD-4BD2-B6B2-1EF5EABA1237}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "09.Mass.Extinction.Discord", "09.Mass.Extinction.Discord\09.Mass.Extinction.Discord.csproj", "{15E6FD42-85B2-4239-8A59-99BB68834C7E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "09.Mass.Extinction.Discord.Service", "09.Mass.Extinction.Discord.Service\09.Mass.Extinction.Discord.Service.csproj", "{3FDC1D72-C74D-4990-8BEA-ADDFE37E07F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VowHelper", "VowHelper\VowHelper.csproj", "{AF6307B9-06FE-4D6D-B3EC-501BEE2DA5AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1868D698-2B73-4D8F-80BD-C6544C6007E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1868D698-2B73-4D8F-80BD-C6544C6007E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1868D698-2B73-4D8F-80BD-C6544C6007E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1868D698-2B73-4D8F-80BD-C6544C6007E9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D1AC9DC6-4260-4A89-A5BB-B50074F016FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D1AC9DC6-4260-4A89-A5BB-B50074F016FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1AC9DC6-4260-4A89-A5BB-B50074F016FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1AC9DC6-4260-4A89-A5BB-B50074F016FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3204CE37-67BD-4BD2-B6B2-1EF5EABA1237}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3204CE37-67BD-4BD2-B6B2-1EF5EABA1237}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3204CE37-67BD-4BD2-B6B2-1EF5EABA1237}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3204CE37-67BD-4BD2-B6B2-1EF5EABA1237}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15E6FD42-85B2-4239-8A59-99BB68834C7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15E6FD42-85B2-4239-8A59-99BB68834C7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15E6FD42-85B2-4239-8A59-99BB68834C7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15E6FD42-85B2-4239-8A59-99BB68834C7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FDC1D72-C74D-4990-8BEA-ADDFE37E07F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FDC1D72-C74D-4990-8BEA-ADDFE37E07F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FDC1D72-C74D-4990-8BEA-ADDFE37E07F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FDC1D72-C74D-4990-8BEA-ADDFE37E07F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF6307B9-06FE-4D6D-B3EC-501BEE2DA5AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF6307B9-06FE-4D6D-B3EC-501BEE2DA5AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF6307B9-06FE-4D6D-B3EC-501BEE2DA5AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF6307B9-06FE-4D6D-B3EC-501BEE2DA5AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

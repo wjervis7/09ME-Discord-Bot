@@ -3,12 +3,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Data.Entities;
+using Extinction.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Models;
+using ViewModels.RoleManager;
+using ViewModels.UserRoles;
 
 [Authorize(Roles = "Admin")]
 public class UserRolesController : Controller
@@ -28,7 +29,8 @@ public class UserRolesController : Controller
         var userRolesViewModel = new List<UserRolesViewModel>();
         foreach (var user in users)
         {
-            var thisViewModel = new UserRolesViewModel {
+            var thisViewModel = new UserRolesViewModel
+            {
                 UserId = user.Id,
                 Email = user.Email,
                 Roles = await GetUserRoles(user)
@@ -57,7 +59,8 @@ public class UserRolesController : Controller
 
         foreach (var role in roles)
         {
-            var userRolesViewModel = new ManageUserRolesViewModel {
+            var userRolesViewModel = new ManageUserRolesViewModel
+            {
                 RoleId = role.Id,
                 RoleName = role.Name,
                 Selected = userRoles.Contains(role.Name)

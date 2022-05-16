@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Data.Entities;
+using Extinction.Data.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -51,7 +51,8 @@ public class ExternalLoginModel : PageModel
     public IActionResult OnPost(string provider, string returnUrl = null)
     {
         // Request a redirect to the external login provider.
-        var redirectUrl = Url.Page("./ExternalLogin", "Callback", new {
+        var redirectUrl = Url.Page("./ExternalLogin", "Callback", new
+        {
             returnUrl
         });
         var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
@@ -64,7 +65,8 @@ public class ExternalLoginModel : PageModel
         if (remoteError != null)
         {
             ErrorMessage = $"Error from external provider: {remoteError}";
-            return RedirectToPage("./Login", new {
+            return RedirectToPage("./Login", new
+            {
                 ReturnUrl = returnUrl
             });
         }
@@ -73,7 +75,8 @@ public class ExternalLoginModel : PageModel
         if (info == null)
         {
             ErrorMessage = "Error loading external login information.";
-            return RedirectToPage("./Login", new {
+            return RedirectToPage("./Login", new
+            {
                 ReturnUrl = returnUrl
             });
         }
@@ -102,7 +105,8 @@ public class ExternalLoginModel : PageModel
 
         var userId = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
         var avatarHash = info.Principal.FindFirstValue("urn:discord:avatar:hash");
-        Input = new InputModel {
+        Input = new InputModel
+        {
             Email = info.Principal.FindFirstValue(ClaimTypes.Email),
             Name = info.Principal.Identity?.Name,
             ProfilePicture = $"https://cdn.discordapp.com/avatars/{userId}/{avatarHash}.png"
@@ -119,14 +123,16 @@ public class ExternalLoginModel : PageModel
         if (info == null)
         {
             ErrorMessage = "Error loading external login information during confirmation.";
-            return RedirectToPage("./Login", new {
+            return RedirectToPage("./Login", new
+            {
                 ReturnUrl = returnUrl
             });
         }
 
         if (ModelState.IsValid)
         {
-            var user = new ApplicationUser {
+            var user = new ApplicationUser
+            {
                 UserName = Input.Email,
                 Email = Input.Email,
                 Name = Input.Name,
@@ -147,7 +153,8 @@ public class ExternalLoginModel : PageModel
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         null,
-                        new {
+                        new
+                        {
                             area = "Identity",
                             userId,
                             code
@@ -160,7 +167,8 @@ public class ExternalLoginModel : PageModel
                     // If account confirmation is required, we need to show the link if we don't have a real email sender
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("./RegisterConfirmation", new {
+                        return RedirectToPage("./RegisterConfirmation", new
+                        {
                             Input.Email
                         });
                     }

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using Data.Entities;
+using Extinction.Data.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -57,7 +57,8 @@ public class RegisterModel : PageModel
         ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         if (ModelState.IsValid)
         {
-            var user = new ApplicationUser {
+            var user = new ApplicationUser
+            {
                 Name = Input.Name,
                 ProfilePicture = Input.ProfilePicture,
                 UserName = Input.Email,
@@ -73,7 +74,8 @@ public class RegisterModel : PageModel
                 var callbackUrl = Url.Page(
                     "/Account/ConfirmEmail",
                     null,
-                    new {
+                    new
+                    {
                         area = "Identity",
                         userId = user.Id,
                         code,
@@ -86,7 +88,8 @@ public class RegisterModel : PageModel
 
                 if (_userManager.Options.SignIn.RequireConfirmedAccount)
                 {
-                    return RedirectToPage("RegisterConfirmation", new {
+                    return RedirectToPage("RegisterConfirmation", new
+                    {
                         email = Input.Email,
                         returnUrl
                     });
