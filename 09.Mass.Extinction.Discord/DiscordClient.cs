@@ -50,7 +50,6 @@ public class DiscordClient
         _logger.LogInformation("Client started.");
         Guild = _client.GetGuild(_configurationMonitor.CurrentValue.GuildId);
         _logger.LogInformation("Connected to guild {guild}:{guildName}", Guild.Id, Guild.Name);
-        var permissions = new Dictionary<ulong, ApplicationCommandPermission[]>();
         // setup slash commands
         foreach (var (name, slashCommand) in _slashCommands)
         {
@@ -62,7 +61,6 @@ public class DiscordClient
                 if (slashCommand.Permissions.Any())
                 {
                     slashCommand.Permissions.Add(new ApplicationCommandPermission(Guild.EveryoneRole, false));
-                    permissions.Add(command.Id, slashCommand.Permissions.ToArray());
                 }
 
                 _logger.LogInformation("Slash command created/updated.");
@@ -72,11 +70,6 @@ public class DiscordClient
                 var json = JsonSerializer.Serialize(exception.Errors);
                 _logger.LogError(exception, "An error has occurred adding the command, {command}:\n{error}.", name, json);
             }
-        }
-
-        if (permissions.Any())
-        {
-            await _client.Rest.BatchEditGuildCommandPermissions(Guild.Id, permissions);
         }
 
         _client.SlashCommandExecuted += command =>
