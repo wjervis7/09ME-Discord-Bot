@@ -1,5 +1,5 @@
 # Base image that runs .NET 6 app
-FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 
 # Build image to build .NET 6 app
