@@ -23,7 +23,7 @@ WORKDIR /src
 COPY ["VowHelper/package*.json", "VowHelper/postcss.config.js", "VowHelper/"]
 COPY ["VowHelper/src", "VowHelper/src"]
 WORKDIR "/src/09.Mass.Extinction.Web"
-RUN npm ci
+RUN npm i
 RUN npm run css
 RUN npm prune --production
 
