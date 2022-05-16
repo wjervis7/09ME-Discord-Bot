@@ -25,7 +25,7 @@ WORKDIR /src
 COPY ["09.Mass.Extinction.Web/package*.json", "09.Mass.Extinction.Web/postcss.config.js", "09.Mass.Extinction.Web/"]
 COPY ["09.Mass.Extinction.Web/src", "09.Mass.Extinction.Web/src"]
 WORKDIR "/src/09.Mass.Extinction.Web"
-RUN npm ci
+RUN npm i
 RUN npm run css
 
 # Copy publish results to base image and set entry point
