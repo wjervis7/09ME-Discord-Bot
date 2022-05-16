@@ -25,9 +25,12 @@ COPY ["VowHelper/src", "VowHelper/src"]
 WORKDIR "/src/09.Mass.Extinction.Web"
 RUN npm ci
 RUN npm run css
+RUN npm prune --production
 
 # Copy publish results to base image and set entry point
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY --from=node /src/09.Mass.Extinction.Web/wwwroot/css ./wwwroot/css
+COPY --from=node /src/09.Mass.Extinction.Web/node_modules ./node_modules
 ENTRYPOINT ["dotnet", "VowHelper.dll"]

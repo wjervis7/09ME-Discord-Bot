@@ -2,7 +2,7 @@
   "name": "vowhelper",
   "description": "Vow of the Disciple helper.",
   "scripts": {
-    "css": "npm-run-all css-compile css-prefix css-minify css-fonts",
+    "css": "npm-run-all css-compile css-prefix css-minify",
     "css-compile": "sass --style expanded --source-map --embed-sources --no-error-css -I node_modules src/scss/:wwwroot/css/",
     "css-minify": "npm-run-all --parallel css-minify-*",
     "css-minify-main": "cleancss -O1 --format breakWith=lf --with-rebase --source-map --source-map-inline-sources --output wwwroot/css/ --batch --batch-suffix \".min\" \"wwwroot/css/*.css\" \"!wwwroot/css/*.min.css\" \"!wwwroot/css/*rtl*.css\"",
