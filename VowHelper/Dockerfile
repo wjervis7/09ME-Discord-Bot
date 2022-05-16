@@ -22,8 +22,8 @@ FROM node:17.4.0 AS node
 WORKDIR /src
 COPY ["VowHelper/package*.json", "VowHelper/postcss.config.js", "VowHelper/"]
 COPY ["VowHelper/src", "VowHelper/src"]
-WORKDIR "/src/09.Mass.Extinction.Web"
-RUN npm i
+WORKDIR "/src/VowHelper"
+RUN npm ci
 RUN npm run css
 RUN npm prune --production
 
@@ -31,6 +31,6 @@ RUN npm prune --production
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY --from=node /src/09.Mass.Extinction.Web/wwwroot/css ./wwwroot/css
-COPY --from=node /src/09.Mass.Extinction.Web/node_modules ./node_modules
+COPY --from=node /src/VowHelper/wwwroot/css ./wwwroot/css
+COPY --from=node /src/VowHelper/node_modules ./node_modules
 ENTRYPOINT ["dotnet", "VowHelper.dll"]
