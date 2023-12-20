@@ -1,45 +1,44 @@
-version: '3.7'
+version: '3.8'
+
 services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD
+    ports:
+      - 1433:1433
+    volumes:
+      - sql:/var/opt/mssql/data
+    networks:
+      - internal
   bot:
     image: wjervis7/09me-discord:latest
     environment:
-      - TOKEN
-      - GUILD
-      - CHANNEL
-      - DB_NAME
-      - DB_USER=sa
-      - DB_PASS
-      - DB_HOST
-      - DB_PORT
-    depends_on:
-      - database
-      - website
-    restart: always
-
-  website:
-    image: wjervis7/09me-website:latest
-    ports:
-      - "443:443"
-      - "80:80"
-    environment:
-      - ConnectionStrings__DefaultConnection=Server=database,1433;Database=${DB_NAME};User=sa;Password=${DB_PASS}
-      - Authentication__Discord__ClientSecret=${DISCORD_CLIENTSECRET}
-      - Authentication__Discord__ClientId=${DISCORD_CLIENTID}
-      - Application__AdminPassword=${ADMIN_PASS}
-      - Application__AdminEmail=${ADMIN_USER}
-      - Email__Username=${EMAIL_USER}
-      - Email__Password=${EMAIL_PASS}
-      - Email__Sender__Display=${EMAIL_Display}
-      - Email__Sender__Email=${EMAIL_USER}
-    depends_on:
-      - database
-    restart: always
-
-  database:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=${DB_PASS}
-    restart: always
+      - IsDiscord=true
+      - ConnectionStrings__DefaultConnection=Server=database;Database=09ME;User=SA;Password=$(MSSQL_SA_PASSWORD)
+      - Discord__ClientId=$(DiscordClientId)
+      - Discord__ClientSecret=$(DiscordClientSecret)
+      - Discord__Token=$(DiscordToken)
+      - Discord__GuildId=$(DiscordGuildId)
     volumes:
-      - /data/09me-sql:/var/opt/mssql/data
+      - configs:/configs
+    networks:
+      - internal
+  web:
+    image: wjervis7/09me-website:latest
+    environment:
+      - IsDiscord=true
+    ports:
+      - 80:80
+    volumes:
+      - configs:/configs
+    networks:
+      - internal
+
+networks:
+  internal:
+
+volumes:
+  sql:
+  configs:
