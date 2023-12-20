@@ -108,15 +108,4 @@ jobs:
           push: true
           tags: ${{ steps.meta-web.outputs.tags }}
           labels: ${{ steps.meta-web.outputs.labels }}  
-          platforms: linux/amd64
-          
-      - name: Build and push Docker image - vow
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: VowHelper/Dockerfile
-          push: true
-          tags: ${{ steps.meta-vow.outputs.tags }}
-          labels: ${{ steps.meta-vow.outputs.labels }}  
-          platforms: linux/amd64
-          
+          platforms: linux/amd64          
