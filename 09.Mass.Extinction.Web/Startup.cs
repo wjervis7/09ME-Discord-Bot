@@ -121,12 +121,12 @@ public static class Startup
     {
         host.ConfigureAppConfiguration((context, configuration) =>
         {
-            if (!context.HostingEnvironment.IsEnvironment("Docker"))
+            if (!context.Configuration.GetValue<bool?>("IsDocker") != true)
             {
                 return;
             }
 
-            configuration.AddJsonFile("appsettings.docker.json", false, true);
+            configuration.AddJsonFile("/configs/appsettings.web.json", true, true);
             configuration.AddKeyPerFile("/run/secrets", true, true);
         });
 
