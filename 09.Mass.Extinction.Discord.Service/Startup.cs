@@ -19,7 +19,7 @@ public static class Startup
     {
         host.ConfigureAppConfiguration((context, configuration) =>
         {
-            if (!configuration.GetValue<bool?>("IsDocker") != true)
+            if (!context.Configuration.GetValue<bool?>("IsDocker") != true)
             {
                 return;
             }
