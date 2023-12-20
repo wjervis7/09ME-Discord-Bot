@@ -85,38 +85,38 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}      
             
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
             
       - name: Build and push Docker image - bot
-        uses: docker/build-push-action@v2.8.0
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: 09.Mass.Extinction.Discord.Service/Dockerfile
           push: true
           tags: ${{ steps.meta-bot.outputs.tags }}
           labels: ${{ steps.meta-bot.outputs.labels }}  
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           
       - name: Build and push Docker image - web
-        uses: docker/build-push-action@v2.8.0
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: 09.Mass.Extinction.Web/Dockerfile
           push: true
           tags: ${{ steps.meta-web.outputs.tags }}
           labels: ${{ steps.meta-web.outputs.labels }}  
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           
       - name: Build and push Docker image - vow
-        uses: docker/build-push-action@v2.8.0
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: VowHelper/Dockerfile
           push: true
           tags: ${{ steps.meta-vow.outputs.tags }}
           labels: ${{ steps.meta-vow.outputs.labels }}  
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           
