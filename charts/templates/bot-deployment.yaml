@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o charts -f docker-compose.yml
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: bot
+  name: bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: bot
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o charts -f docker-compose.yml
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/09me-discord-bot-internal: "true"
+        io.kompose.service: bot
+    spec:
+      containers:
+        - env:
+            - name: ConnectionStrings__DefaultConnection
+              value: Server=database;Database=09ME;User=SA;Password=$(MSSQL_SA_PASSWORD)
+            - name: Discord__ClientId
+              value: $(DiscordClientId)
+            - name: Discord__ClientSecret
+              value: $(DiscordClientSecret)
+            - name: Discord__GuildId
+              value: $(DiscordGuildId)
+            - name: Discord__Token
+              value: $(DiscordToken)
+            - name: IsDiscord
+              value: "true"
+          image: wjervis7/09me-discord:latest
+          name: bot
+          resources: {}
+          volumeMounts:
+            - mountPath: /configs
+              name: configs
+      restartPolicy: Always
+      volumes:
+        - name: configs
+          persistentVolumeClaim:
+            claimName: configs
+status: {}
