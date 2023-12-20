@@ -67,22 +67,7 @@ jobs:
             type=raw,value=latest,enable=${{ steps.vars.outputs.branch == 'master' }}
             type=raw,value=beta,enable=${{ steps.vars.outputs.branch == 'dev' }}
             type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            
-      - name: Extract metadata (tags, labels) for Docker - web
-        id: meta-vow
-        uses: docker/metadata-action@v3.6.2
-        with:
-          images: |
-            ${{ secrets.DOCKER_USERNAME }}/09me-vow
-            ghcr.io/${{ github.repository_owner }}/09me-vow
-          flavor: |
-            latest=false
-          tags: |
-            type=raw,value=latest,enable=${{ steps.vars.outputs.branch == 'master' }}
-            type=raw,value=beta,enable=${{ steps.vars.outputs.branch == 'dev' }}
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}      
+            type=semver,pattern={{major}}.{{minor}}  
             
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
