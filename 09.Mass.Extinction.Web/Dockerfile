@@ -25,6 +25,7 @@ WORKDIR /src
 COPY ["09.Mass.Extinction.Web/package*.json", "09.Mass.Extinction.Web/postcss.config.js", "09.Mass.Extinction.Web/"]
 COPY ["09.Mass.Extinction.Web/src", "09.Mass.Extinction.Web/src"]
 WORKDIR "/src/09.Mass.Extinction.Web"
+RUN npm i --global npm
 RUN npm ci
 RUN npm run css
 
