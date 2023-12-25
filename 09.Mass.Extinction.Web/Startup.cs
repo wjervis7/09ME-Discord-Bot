@@ -24,12 +24,17 @@ public static class Startup
 {
     public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        var connectionStringBuilder = new SqlConnectionStringBuilder(configuration.GetConnectionString("DefaultConnection"));
-        var sqlPassword = configuration.GetValue<string>("sqlpass");
-        if (!string.IsNullOrWhiteSpace(sqlPassword))
-        {
-            connectionStringBuilder.Password = sqlPassword;
-        }
+        var connectionStringBuilder = new SqlConnectionStringBuilder();
+        var dbHost = configuration.GetValue<string>("Database:Host");
+        var dbPort = configuration.GetValue<int>("Database:Port");
+        var dbDatabase = configuration.GetValue<string>("Database:Database");
+        var dbUser = configuration.GetValue<string>("Database:User");
+        var dbPassword = configuration.GetValue<string>("Database:Password");
+
+        connectionStringBuilder["Server"] = $"{dbHost},{dbPort}";
+        connectionStringBuilder["Database"] = dbDatabase;
+        connectionStringBuilder.UserID = dbUser;
+        connectionStringBuilder.Password = dbPassword;
 
         services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionStringBuilder.ToString()));
         services.AddDatabaseDeveloperPageExceptionFilter();
@@ -121,7 +126,8 @@ public static class Startup
     {
         host.ConfigureAppConfiguration((context, configuration) =>
         {
-            if (!context.Configuration.GetValue<bool?>("IsDocker") != true)
+            var isDocker = context.Configuration.GetValue<bool?>("IsDocker");
+            if (isDocker != true)
             {
                 return;
             }
