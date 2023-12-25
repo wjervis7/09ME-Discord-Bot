@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Web.Email;
+﻿namespace Ninth.Mass.Extinction.Web.Email;
 
 using System;
 using System.Text;
@@ -9,14 +9,9 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
 
-public class ZohoEmailSender : IEmailSender
+public class ZohoEmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor) : IEmailSender
 {
-    public ZohoEmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor)
-    {
-        Options = optionsAccessor.Value;
-    }
-
-    public AuthMessageSenderOptions Options { get; }
+    public AuthMessageSenderOptions Options { get; } = optionsAccessor.Value;
 
     public Task SendEmailAsync(string email, string subject, string message)
     {

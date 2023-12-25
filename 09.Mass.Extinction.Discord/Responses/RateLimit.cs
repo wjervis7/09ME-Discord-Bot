@@ -1,6 +1,6 @@
 ﻿// ReSharper disable UnusedMember.Global
 
-namespace _09.Mass.Extinction.Discord.Responses;
+namespace Ninth.Mass.Extinction.Discord.Responses;
 
 using System.Text.Json.Serialization;
 

@@ -1,4 +1,4 @@
-namespace _09.Mass.Extinction.Web.ViewModels;
+namespace Ninth.Mass.Extinction.Web.ViewModels;
 
 public class ErrorViewModel
 {

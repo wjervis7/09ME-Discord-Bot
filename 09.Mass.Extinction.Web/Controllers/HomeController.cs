@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Web.Controllers;
+﻿namespace Ninth.Mass.Extinction.Web.Controllers;
 
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;

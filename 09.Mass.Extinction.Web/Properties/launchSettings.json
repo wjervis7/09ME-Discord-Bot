@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "_09.Mass.Extinction.Web": {
+    "Ninth.Mass.Extinction.Web": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

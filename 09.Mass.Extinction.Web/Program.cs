@@ -1,13 +1,13 @@
 using System;
-using _09.Mass.Extinction.Data;
-using _09.Mass.Extinction.Data.Entities;
-using _09.Mass.Extinction.Web;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Ninth.Mass.Extinction.Data;
+using Ninth.Mass.Extinction.Data.Entities;
+using Ninth.Mass.Extinction.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 Startup.ConfigureHost(builder.Host);

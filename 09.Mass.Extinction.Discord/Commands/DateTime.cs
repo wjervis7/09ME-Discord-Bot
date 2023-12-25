@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Discord.Commands;
+﻿namespace Ninth.Mass.Extinction.Discord.Commands;
 
 using Data;
 using global::Discord;
@@ -6,19 +6,9 @@ using global::Discord.WebSocket;
 using Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SystemDateTime = System.DateTime;
 
-public class DateTime : ISlashCommand
+public class DateTime(ILogger<DateTime> logger, IServiceProvider serviceProvider) : ISlashCommand
 {
-    private readonly ILogger<DateTime> _logger;
-    private readonly IServiceProvider _serviceProvider;
-
-    public DateTime(ILogger<DateTime> logger, IServiceProvider serviceProvider)
-    {
-        _logger = logger;
-        _serviceProvider = serviceProvider;
-    }
-
     public SlashCommandOptionBuilder[] Options =>
         new[]
         {
@@ -66,17 +56,17 @@ public class DateTime : ISlashCommand
 
     public async void Handle(SocketSlashCommand command)
     {
-        _logger.LogDebug("Entering command handler.");
+        logger.LogDebug("Entering command handler.");
 
-        await using var scope = _serviceProvider.CreateAsyncScope();
+        await using var scope = serviceProvider.CreateAsyncScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        _logger.LogDebug("Get user from database.");
+        logger.LogDebug("Get user from database.");
         var user = await context.DiscordUsers.FindAsync(command.User.Id);
 
         if (string.IsNullOrWhiteSpace(user?.TimeZone))
         {
-            _logger.LogDebug("User does not have time zone set.");
+            logger.LogDebug("User does not have time zone set.");
             await command.RespondAsync("You must set your time zone, prior to using this command. Use `/time-zone set`, to set your time zone.", ephemeral: true);
             return;
         }
@@ -88,8 +78,8 @@ public class DateTime : ISlashCommand
         var timeStr = command.Data.Options.GetValue<string>("time");
         var message = command.Data.Options.GetNullableValue<string?>("message");
 
-        _logger.LogDebug("Try parse datetime.");
-        _logger.LogInformation("Attempting to parse {dateTime}, in time zone {timeZone}.", $"Year: {year}, Month: {month}, Day: {day}, Time: {timeStr}", timeZone.Id);
+        logger.LogDebug("Try parse datetime.");
+        logger.LogInformation("Attempting to parse {dateTime}, in time zone {timeZone}.", $"Year: {year}, Month: {month}, Day: {day}, Time: {timeStr}", timeZone.Id);
         try
         {
             DateTimeHelper.ValidateDate(year, month, day);
@@ -102,6 +92,6 @@ public class DateTime : ISlashCommand
             await command.RespondAsync(e.Message);
         }
 
-        _logger.LogDebug("Command handler complete.");
+        logger.LogDebug("Command handler complete.");
     }
 }

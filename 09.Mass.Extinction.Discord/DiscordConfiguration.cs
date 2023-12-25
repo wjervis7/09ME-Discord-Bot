@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Discord;
+﻿namespace Ninth.Mass.Extinction.Discord;
 
 using Commands;
 

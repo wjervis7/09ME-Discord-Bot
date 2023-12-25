@@ -1,16 +1,11 @@
-﻿namespace _09.Mass.Extinction.Data;
+﻿namespace Ninth.Mass.Extinction.Data;
 
 using Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options)
-    {
-    }
-
     public DbSet<Message> Messages { get; set; }
     public DbSet<DiscordUser> DiscordUsers { get; set; }
     public DbSet<ActivityReport> ActivityReports { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Data.Entities;
+﻿namespace Ninth.Mass.Extinction.Data.Entities;
 
 public class Message
 {

@@ -1,6 +1,4 @@
-﻿namespace _09.Mass.Extinction.Data.Entities;
-
-using System;
+﻿namespace Ninth.Mass.Extinction.Data.Entities;
 
 public class ActivityReport
 {

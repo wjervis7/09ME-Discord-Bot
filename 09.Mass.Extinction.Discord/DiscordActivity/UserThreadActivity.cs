@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Discord.DiscordActivity;
+﻿namespace Ninth.Mass.Extinction.Discord.DiscordActivity;
 
 public class UserThreadActivity : UserChannelActivity
 {

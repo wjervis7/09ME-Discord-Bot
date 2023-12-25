@@ -1,4 +1,4 @@
-namespace _09.Mass.Extinction.Web;
+namespace Ninth.Mass.Extinction.Web;
 
 using System;
 using System.Net.Http;
@@ -35,6 +35,7 @@ public static class Startup
         connectionStringBuilder["Database"] = dbDatabase;
         connectionStringBuilder.UserID = dbUser;
         connectionStringBuilder.Password = dbPassword;
+        connectionStringBuilder.TrustServerCertificate = true;
 
         services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionStringBuilder.ToString()));
         services.AddDatabaseDeveloperPageExceptionFilter();
@@ -60,8 +61,8 @@ public static class Startup
             .AddDiscord(options =>
             {
                 var discordAuthSection = configuration.GetSection("Discord");
-                options.ClientId = discordAuthSection["ClientId"];
-                options.ClientSecret = discordAuthSection["ClientSecret"];
+                options.ClientId = discordAuthSection["ClientId"] ?? throw new InvalidOperationException("Discord:ClientId cannot be null.");
+                options.ClientSecret = discordAuthSection["ClientSecret"] ?? throw new InvalidOperationException("Discord:ClientSecret cannot be null.");
                 options.Scope.Add("email");
 
                 options.SaveTokens = true;

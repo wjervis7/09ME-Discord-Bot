@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Web.ViewModels.UserRoles;
+﻿namespace Ninth.Mass.Extinction.Web.ViewModels.UserRoles;
 
 using System.Collections.Generic;
 

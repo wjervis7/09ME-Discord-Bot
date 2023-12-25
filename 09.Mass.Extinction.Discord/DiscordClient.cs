@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Discord;
+﻿namespace Ninth.Mass.Extinction.Discord;
 
 using System.Text.Json;
 using Commands;
@@ -57,7 +57,7 @@ public class DiscordClient
             var commandBuilder = CreateSlashCommand(slashCommand);
             try
             {
-                var command = await Guild.CreateApplicationCommandAsync(commandBuilder.Build());
+                await Guild.CreateApplicationCommandAsync(commandBuilder.Build());
                 if (slashCommand.Permissions.Any())
                 {
                     slashCommand.Permissions.Add(new ApplicationCommandPermission(Guild.EveryoneRole, false));

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace _09.Mass.Extinction.Web.Data.Migrations
+namespace Ninth.Mass.Extinction.Web.Data.Migrations
 {
     public partial class Messages : Migration
     {
