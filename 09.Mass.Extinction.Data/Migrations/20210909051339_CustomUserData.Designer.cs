@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using _09.Mass.Extinction.Web.Data;
+using Ninth.Mass.Extinction.Web.Data;
 
-namespace _09.Mass.Extinction.Web.Data.Migrations
+namespace Ninth.Mass.Extinction.Web.Data.Migrations
 {
-    using Extinction.Data;
+    using Ninth.Mass.Extinction.Data;
 
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20210909051339_CustomUserData")]
@@ -157,7 +157,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("_09.Mass.Extinction.Web.Data.Entities.ApplicationUser", b =>
+            modelBuilder.Entity("Ninth.Mass.Extinction.Web.Data.Entities.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -228,7 +228,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("_09.Mass.Extinction.Web.Data.Entities.Message", b =>
+            modelBuilder.Entity("Ninth.Mass.Extinction.Web.Data.Entities.Message", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -266,7 +266,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("_09.Mass.Extinction.Web.Data.Entities.ApplicationUser", null)
+                    b.HasOne("Ninth.Mass.Extinction.Web.Data.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -275,7 +275,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("_09.Mass.Extinction.Web.Data.Entities.ApplicationUser", null)
+                    b.HasOne("Ninth.Mass.Extinction.Web.Data.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -290,7 +290,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("_09.Mass.Extinction.Web.Data.Entities.ApplicationUser", null)
+                    b.HasOne("Ninth.Mass.Extinction.Web.Data.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -299,7 +299,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("_09.Mass.Extinction.Web.Data.Entities.ApplicationUser", null)
+                    b.HasOne("Ninth.Mass.Extinction.Web.Data.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

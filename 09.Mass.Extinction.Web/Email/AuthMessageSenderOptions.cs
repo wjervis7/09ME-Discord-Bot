@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Web.Email;
+﻿namespace Ninth.Mass.Extinction.Web.Email;
 
 using MailKit.Security;
 

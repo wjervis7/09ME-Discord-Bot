@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Web.ViewModels.Discord;
+﻿namespace Ninth.Mass.Extinction.Web.ViewModels.Discord;
 
 public class ActivityReport
 {

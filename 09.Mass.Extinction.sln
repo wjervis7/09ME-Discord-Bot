@@ -22,7 +22,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "09.Mass.Extinction.Discord"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "09.Mass.Extinction.Discord.Service", "09.Mass.Extinction.Discord.Service\09.Mass.Extinction.Discord.Service.csproj", "{3FDC1D72-C74D-4990-8BEA-ADDFE37E07F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VowHelper", "VowHelper\VowHelper.csproj", "{AF6307B9-06FE-4D6D-B3EC-501BEE2DA5AD}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{DC8AA79A-78B3-4CB6-9259-A9FB8D33BD57}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{D043EB7B-15E7-487E-A6F2-4F18E8D0D1C4}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\discord-docker-image.yml = .github\workflows\discord-docker-image.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,13 +51,13 @@ Global
 		{3FDC1D72-C74D-4990-8BEA-ADDFE37E07F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FDC1D72-C74D-4990-8BEA-ADDFE37E07F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FDC1D72-C74D-4990-8BEA-ADDFE37E07F5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF6307B9-06FE-4D6D-B3EC-501BEE2DA5AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF6307B9-06FE-4D6D-B3EC-501BEE2DA5AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF6307B9-06FE-4D6D-B3EC-501BEE2DA5AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF6307B9-06FE-4D6D-B3EC-501BEE2DA5AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DC8AA79A-78B3-4CB6-9259-A9FB8D33BD57} = {44B16E39-AEEA-42EB-9E19-56C519934A33}
+		{D043EB7B-15E7-487E-A6F2-4F18E8D0D1C4} = {DC8AA79A-78B3-4CB6-9259-A9FB8D33BD57}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6AB1E210-A040-4E99-B11C-89207530003F}

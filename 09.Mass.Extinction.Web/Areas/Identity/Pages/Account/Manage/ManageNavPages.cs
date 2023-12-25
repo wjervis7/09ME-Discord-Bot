@@ -2,7 +2,7 @@
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace _09.Mass.Extinction.Web.Areas.Identity.Pages.Account.Manage;
+namespace Ninth.Mass.Extinction.Web.Areas.Identity.Pages.Account.Manage;
 
 using System;
 using System.IO;

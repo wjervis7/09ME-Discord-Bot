@@ -1,7 +1,5 @@
-﻿namespace _09.Mass.Extinction.Data;
+﻿namespace Ninth.Mass.Extinction.Data;
 
-using System.Linq;
-using System.Threading.Tasks;
 using Entities;
 using Enums;
 using Microsoft.AspNetCore.Identity;
@@ -25,7 +23,8 @@ public class ContextSeed
 
     public static async Task SeedAdminUserAsync(UserManager<ApplicationUser> userManager, IConfiguration configuration)
     {
-        var adminUser = new ApplicationUser {
+        var adminUser = new ApplicationUser
+        {
             UserName = configuration.GetValue<string>("Application:AdminEmail"),
             Name = "Admin User",
             ProfilePicture = "https://cdn.discordapp.com/avatars/850452578705735720/ecd4aacda4e908f90fc15c01dc196a14.png",
@@ -34,10 +33,10 @@ public class ContextSeed
         };
         if (userManager.Users.All(u => u.Id != adminUser.Id))
         {
-            var user = await userManager.FindByEmailAsync(adminUser.Email);
+            var user = await userManager.FindByEmailAsync(adminUser.Email!);
             if (user == null)
             {
-                await userManager.CreateAsync(adminUser, configuration.GetValue<string>("Application:AdminPassword"));
+                await userManager.CreateAsync(adminUser, configuration.GetValue<string>("Application:AdminPassword") ?? throw new InvalidOperationException("Application:AdminPassword must be set."));
                 await userManager.AddToRoleAsync(adminUser, Roles.DiscordAdmin.ToString());
                 await userManager.AddToRoleAsync(adminUser, Roles.Admin.ToString());
             }

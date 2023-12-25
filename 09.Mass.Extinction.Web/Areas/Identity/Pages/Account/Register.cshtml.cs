@@ -1,6 +1,6 @@
 ﻿// ReSharper disable UnusedMember.Global
 
-namespace _09.Mass.Extinction.Web.Areas.Identity.Pages.Account;
+namespace Ninth.Mass.Extinction.Web.Areas.Identity.Pages.Account;
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,25 +19,13 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
 [AllowAnonymous]
-public class RegisterModel : PageModel
-{
-    private readonly IEmailSender _emailSender;
-    private readonly ILogger<RegisterModel> _logger;
-    private readonly SignInManager<ApplicationUser> _signInManager;
-    private readonly UserManager<ApplicationUser> _userManager;
-
-    public RegisterModel(
+public class RegisterModel(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         ILogger<RegisterModel> logger,
         IEmailSender emailSender)
-    {
-        _userManager = userManager;
-        _signInManager = signInManager;
-        _logger = logger;
-        _emailSender = emailSender;
-    }
-
+    : PageModel
+{
     [BindProperty]
     public InputModel Input { get; set; }
 
@@ -48,13 +36,13 @@ public class RegisterModel : PageModel
     public async Task OnGetAsync(string returnUrl = null)
     {
         ReturnUrl = returnUrl;
-        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+        ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
     }
 
     public async Task<IActionResult> OnPostAsync(string returnUrl = null)
     {
         returnUrl ??= Url.Content("~/");
-        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+        ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         if (ModelState.IsValid)
         {
             var user = new ApplicationUser
@@ -64,12 +52,12 @@ public class RegisterModel : PageModel
                 UserName = Input.Email,
                 Email = Input.Email
             };
-            var result = await _userManager.CreateAsync(user, Input.Password);
+            var result = await userManager.CreateAsync(user, Input.Password);
             if (result.Succeeded)
             {
-                _logger.LogInformation("User created a new account with password.");
+                logger.LogInformation("User created a new account with password.");
 
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 var callbackUrl = Url.Page(
                     "/Account/ConfirmEmail",
@@ -83,10 +71,10 @@ public class RegisterModel : PageModel
                     },
                     Request.Scheme);
 
-                await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                await emailSender.SendEmailAsync(Input.Email, "Confirm your email",
                     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl ?? "#")}'>clicking here</a>.");
 
-                if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                if (userManager.Options.SignIn.RequireConfirmedAccount)
                 {
                     return RedirectToPage("RegisterConfirmation", new
                     {
@@ -95,7 +83,7 @@ public class RegisterModel : PageModel
                     });
                 }
 
-                await _signInManager.SignInAsync(user, false);
+                await signInManager.SignInAsync(user, false);
                 return LocalRedirect(returnUrl);
             }
 

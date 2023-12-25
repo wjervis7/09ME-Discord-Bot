@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Discord.Helpers;
+﻿namespace Ninth.Mass.Extinction.Discord.Helpers;
 
 using System.Collections.Concurrent;
 using System.Text;

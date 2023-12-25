@@ -4,12 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using _09.Mass.Extinction.Data;
 
 #nullable disable
 
-namespace _09.Mass.Extinction.Web.Data.Migrations
+namespace Ninth.Mass.Extinction.Web.Data.Migrations
 {
+    using Ninth.Mass.Extinction.Data;
+
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
@@ -22,7 +23,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("_09.Mass.Extinction.Data.Entities.ActivityReport", b =>
+            modelBuilder.Entity("Ninth.Mass.Extinction.Data.Entities.ActivityReport", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -58,7 +59,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
                     b.ToTable("ActivityReports");
                 });
 
-            modelBuilder.Entity("_09.Mass.Extinction.Data.Entities.ApplicationUser", b =>
+            modelBuilder.Entity("Ninth.Mass.Extinction.Data.Entities.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -131,7 +132,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("_09.Mass.Extinction.Data.Entities.DiscordUser", b =>
+            modelBuilder.Entity("Ninth.Mass.Extinction.Data.Entities.DiscordUser", b =>
                 {
                     b.Property<decimal>("Id")
                         .HasColumnType("decimal(20,0)")
@@ -145,7 +146,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
                     b.ToTable("DiscordUsers");
                 });
 
-            modelBuilder.Entity("_09.Mass.Extinction.Data.Entities.Message", b =>
+            modelBuilder.Entity("Ninth.Mass.Extinction.Data.Entities.Message", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -323,7 +324,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("_09.Mass.Extinction.Data.Entities.ApplicationUser", null)
+                    b.HasOne("Ninth.Mass.Extinction.Data.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -332,7 +333,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("_09.Mass.Extinction.Data.Entities.ApplicationUser", null)
+                    b.HasOne("Ninth.Mass.Extinction.Data.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -347,7 +348,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("_09.Mass.Extinction.Data.Entities.ApplicationUser", null)
+                    b.HasOne("Ninth.Mass.Extinction.Data.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -356,7 +357,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("_09.Mass.Extinction.Data.Entities.ApplicationUser", null)
+                    b.HasOne("Ninth.Mass.Extinction.Data.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
