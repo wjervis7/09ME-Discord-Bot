@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Web.ViewModels.RoleManager;
+﻿namespace Ninth.Mass.Extinction.Web.ViewModels.RoleManager;
 
 public class ManageUserRolesViewModel
 {

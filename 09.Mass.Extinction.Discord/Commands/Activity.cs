@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Discord.Commands;
+﻿namespace Ninth.Mass.Extinction.Discord.Commands;
 
 using System.Text.Json;
 using System.Text.Json.Serialization;

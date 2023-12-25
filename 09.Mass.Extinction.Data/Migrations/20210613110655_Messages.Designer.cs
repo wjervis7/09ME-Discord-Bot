@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using _09.Mass.Extinction.Web.Data;
+using Ninth.Mass.Extinction.Web.Data;
 
-namespace _09.Mass.Extinction.Web.Data.Migrations
+namespace Ninth.Mass.Extinction.Web.Data.Migrations
 {
-    using Extinction.Data;
+    using Ninth.Mass.Extinction.Data;
 
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20210613110655_Messages")]
@@ -222,7 +222,7 @@ namespace _09.Mass.Extinction.Web.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("_09.Mass.Extinction.Web.Data.Entities.Message", b =>
+            modelBuilder.Entity("Ninth.Mass.Extinction.Web.Data.Entities.Message", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()

@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Web.Areas.Identity.Pages.Account;
+﻿namespace Ninth.Mass.Extinction.Web.Areas.Identity.Pages.Account;
 
 using System.Text;
 using System.Threading.Tasks;
@@ -11,15 +11,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
 [AllowAnonymous]
-public class RegisterConfirmationModel : PageModel
+public class RegisterConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender sender) : PageModel
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-
-    public RegisterConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender sender)
-    {
-        _userManager = userManager;
-    }
-
     public string Email { get; set; }
 
     public bool DisplayConfirmAccountLink { get; set; }
@@ -34,7 +27,7 @@ public class RegisterConfirmationModel : PageModel
             return RedirectToPage("/Index");
         }
 
-        var user = await _userManager.FindByEmailAsync(email);
+        var user = await userManager.FindByEmailAsync(email);
         if (user == null)
         {
             return NotFound($"Unable to load user with email '{email}'.");
@@ -42,8 +35,8 @@ public class RegisterConfirmationModel : PageModel
 
         Email = email;
 
-        var userId = await _userManager.GetUserIdAsync(user);
-        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var userId = await userManager.GetUserIdAsync(user);
+        var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
         EmailConfirmationUrl = Url.Page(
             "/Account/ConfirmEmail",

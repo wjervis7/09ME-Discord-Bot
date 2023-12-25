@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Web.Controllers;
+﻿namespace Ninth.Mass.Extinction.Web.Controllers;
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -7,18 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 [Authorize(Roles = "Admin")]
-public class RoleManagerController : Controller
+public class RoleManagerController(RoleManager<IdentityRole> roleManager) : Controller
 {
-    private readonly RoleManager<IdentityRole> _roleManager;
-
-    public RoleManagerController(RoleManager<IdentityRole> roleManager)
-    {
-        _roleManager = roleManager;
-    }
-
     public async Task<IActionResult> Index()
     {
-        var roles = await _roleManager.Roles.ToListAsync();
+        var roles = await roleManager.Roles.ToListAsync();
         return View(roles);
     }
 
@@ -27,7 +20,7 @@ public class RoleManagerController : Controller
     {
         if (roleName != null)
         {
-            await _roleManager.CreateAsync(new IdentityRole(roleName.Trim()));
+            await roleManager.CreateAsync(new IdentityRole(roleName.Trim()));
         }
 
         return RedirectToAction("Index");

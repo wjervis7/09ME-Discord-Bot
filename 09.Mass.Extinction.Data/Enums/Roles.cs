@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Data.Enums;
+﻿namespace Ninth.Mass.Extinction.Data.Enums;
 
 public enum Roles
 {

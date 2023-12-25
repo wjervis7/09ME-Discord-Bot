@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Web.Controllers;
+﻿namespace Ninth.Mass.Extinction.Web.Controllers;
 
 using System;
 using System.Collections.Generic;
@@ -14,23 +14,15 @@ using Microsoft.EntityFrameworkCore;
 using ViewModels.Discord;
 
 [Authorize(Roles = "DiscordAdmin")]
-public class DiscordController : Controller
+public class DiscordController(ApplicationDbContext context, DiscordService discord) : Controller
 {
     private static readonly Regex _channelRegex = new("(?<=\\<\\#)(.*?)(?=\\>)");
     private static readonly Regex _userRegex = new("(?<=\\\"user\\\"\\:\\\")(\\d*)(?=\\\")");
-    private readonly ApplicationDbContext _context;
-    private readonly DiscordService _discord;
-
-    public DiscordController(ApplicationDbContext context, DiscordService discord)
-    {
-        _context = context;
-        _discord = discord;
-    }
 
     [HttpGet]
     public async Task<IActionResult> Messages()
     {
-        var messages = await _context.Messages.Select(m => new AdminMessage
+        var messages = await context.Messages.Select(m => new AdminMessage
         {
             Id = m.Id,
             Sender = m.Sender,
@@ -39,7 +31,7 @@ public class DiscordController : Controller
             IsAnonymous = m.IsAnonymous
         }).ToListAsync();
 
-        var users = (await _discord.GetUsersByUsernames(messages.Select(m => m.Sender).ToList())).ToList();
+        var users = (await discord.GetUsersByUsernames(messages.Select(m => m.Sender).ToList())).ToList();
 
         var model = messages.Select(m =>
         {
@@ -57,7 +49,7 @@ public class DiscordController : Controller
     [HttpGet]
     public async Task<IActionResult> ActivityReports()
     {
-        var reports = await _context.ActivityReports.Select(ar => new ActivityReport
+        var reports = await context.ActivityReports.Select(ar => new ActivityReport
         {
             Id = ar.Id,
             InitiatorId = ar.Initiator,
@@ -71,9 +63,9 @@ public class DiscordController : Controller
         var userIds = new List<ulong>();
         userIds.AddRange(reports.Select(r => r.InitiatorId));
         userIds.AddRange(reports.SelectMany(r => GetUserIdsFromArgs(r.Args)));
-        var users = (await _discord.GetUsersByIds(userIds)).ToList();
+        var users = (await discord.GetUsersByIds(userIds)).ToList();
 
-        var channels = (await _discord.GetChannels(reports.SelectMany(r => GetChannelIdsFromReport(r.Report)).ToList())).ToList();
+        var channels = (await discord.GetChannels(reports.SelectMany(r => GetChannelIdsFromReport(r.Report)).ToList())).ToList();
 
         var model = reports.Select(r =>
         {

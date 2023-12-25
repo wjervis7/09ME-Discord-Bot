@@ -1,9 +1,9 @@
-﻿using _09.Mass.Extinction.Web.Areas.Identity;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
+using Ninth.Mass.Extinction.Web.Areas.Identity;
 
 [assembly: HostingStartup(typeof(IdentityHostingStartup))]
 
-namespace _09.Mass.Extinction.Web.Areas.Identity;
+namespace Ninth.Mass.Extinction.Web.Areas.Identity;
 
 using Microsoft.AspNetCore.Hosting;
 

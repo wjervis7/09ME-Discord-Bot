@@ -1,6 +1,5 @@
-namespace _09.Mass.Extinction.Discord.Service;
+namespace Ninth.Mass.Extinction.Discord.Service;
 
-using _09.Mass.Extinction.Discord.Helpers;
 using Commands;
 using Data;
 using DiscordActivity;
@@ -9,6 +8,7 @@ using global::Discord;
 using global::Discord.Addons.Interactive;
 using global::Discord.Commands;
 using global::Discord.WebSocket;
+using Helpers;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -47,6 +47,7 @@ public static class Startup
         connectionStringBuilder["Database"] = dbDatabase;
         connectionStringBuilder.UserID = dbUser;
         connectionStringBuilder.Password = dbPassword;
+        connectionStringBuilder.TrustServerCertificate = true;
 
         services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionStringBuilder.ToString()));
 

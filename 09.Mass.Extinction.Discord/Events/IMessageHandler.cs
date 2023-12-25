@@ -1,4 +1,4 @@
-﻿namespace _09.Mass.Extinction.Discord.Events;
+﻿namespace Ninth.Mass.Extinction.Discord.Events;
 
 using global::Discord.WebSocket;
 

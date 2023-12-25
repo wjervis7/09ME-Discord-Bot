@@ -1,6 +1,6 @@
 ﻿// ReSharper disable UnusedAutoPropertyAccessor.Global
 
-namespace _09.Mass.Extinction.Discord.Commands;
+namespace Ninth.Mass.Extinction.Discord.Commands;
 
 // ReSharper disable once ClassNeverInstantiated.Global
 public class CommandConfiguration

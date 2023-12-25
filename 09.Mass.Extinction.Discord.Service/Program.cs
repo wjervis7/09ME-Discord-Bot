@@ -1,4 +1,4 @@
-using _09.Mass.Extinction.Discord.Service;
+using Ninth.Mass.Extinction.Discord.Service;
 
 var hostBuilder = Host.CreateDefaultBuilder(args);
 Startup.ConfigureHost(hostBuilder);
